@@ -16,12 +16,17 @@ import { ApiService } from '../../services/api.service';
 export class ExperimentTypeCreateComponent {
   form: FormGroup;
   fieldTypes = ['text', 'textarea', 'number', 'date', 'boolean', 'select', 'list'];
+  experiment_types: any[] = [];
 
   constructor(private fb: FormBuilder, private api: ApiService) {
     this.form = this.fb.group({
       name: ['', Validators.required],
       fields: this.fb.array([])
     });
+  }
+  
+  ngOnInit() {
+    this.loadExperimentTypes();
   }
 
   get fields(): FormArray {
@@ -62,9 +67,20 @@ export class ExperimentTypeCreateComponent {
         alert('Experiment type created successfully!');
         this.form.reset();
         this.fields.clear();
+        this.loadExperimentTypes();
       },
       error: (err: any) => console.error(err)
     });
   }
 
+  loadExperimentTypes() {
+    this.api.getExperimentTypes().subscribe({
+      next: (res) => {
+        this.experiment_types = res;
+      },
+      error: (err) => {
+        console.error("Failed to load experiment types", err);
+      }
+    });
+  }
 }

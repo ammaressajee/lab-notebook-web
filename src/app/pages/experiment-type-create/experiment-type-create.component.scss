@@ -1,0 +1,31 @@
+.experiment-type-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px;
+}
+
+.experiment-type-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+}
+
+.fields-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.fields-table th,
+.fields-table td {
+  border: 1px solid #ddd;
+  padding: 6px 8px;
+}
+
+.fields-table th {
+  background-color: #f0f0f0;
+  text-align: left;
+}

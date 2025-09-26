@@ -3,16 +3,13 @@
 <mat-sidenav-container class="sidenav-container">
   <mat-sidenav #sidenav mode="side" opened>
     <mat-nav-list>
-      <a mat-list-item routerLink="/submit" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
-        Submit New Data
+      <a mat-list-item routerLink="/projects" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        Projects
       </a>
-      <a mat-list-item routerLink="/view" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
-        View Experiment Data
+      <a mat-list-item routerLink="/create-experiment-type" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        Experiment Types
       </a>
-      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link"
-        [routerLinkActiveOptions]="{ exact: true }">
-        View Dashboard
-      </a>
+      
     </mat-nav-list>
   </mat-sidenav>
 
