@@ -1,0 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
+:root {
+  --primary-color: #1e88e5;          /* toolbar / navbar background */
+  --primary-text-color: #ffffff;     /* toolbar text color */
+  --sidenav-bg-color: #1565c0;       /* sidenav background */
+  --sidenav-text-color: #ffffff;     /* sidenav text */
+  --sidenav-hover-color: #1e88e5;    /* link hover color */
+  --content-bg-color: #f0f2f5;       /* main content background */
+  --content-text-color: #222222;     /* main content text color */
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  background-color: var(--content-bg-color);
+  color: var(--content-text-color);
+}
+
+/* Toolbar / Navbar */
+mat-toolbar {
+  background-color: var(--primary-color);
+  color: var(--primary-text-color);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+/* Sidenav */
+mat-sidenav {
+  width: 250px;
+  padding: 20px;
+  background-color: rgba(181, 186, 181, 0.421);
+  color: var(--sidenav-text-color);
+
+mat-nav-list a {
+  text-decoration: none;
+  color: #933b3b;
+  font-weight: 500;
+  font-size: 16px;
+  margin-bottom: 12px;
+  display: flex;            // use flexbox
+  align-items: center;      // vertical centering
+  justify-content: center;  // horizontal centering
+  border-radius: 8px;
+  padding: 10px 16px;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  font-family: 'Roboto', 'Helvetica Neue', sans-serif;
+
+  &:hover {
+    background-color: #94a4a6;
+    color: #00796b;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+}
+}
+
+.active-link {
+  background-color: #0e625876;
+  color: #004d40;
+  font-weight: 600;
+  border-radius: 5px;
+}
+
+/* Main content area */
+mat-sidenav-content {
+  padding: 20px;
+  background-color: rgba(22, 98, 93, 0.296);
+  color: var(--content-text-color);
+  min-height: 100vh; /* fill full height */
+}

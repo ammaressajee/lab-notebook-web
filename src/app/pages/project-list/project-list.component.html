@@ -1,0 +1,11 @@
+<h1>Projects</h1>
+    <ul>
+      <li *ngFor="let project of projects" (click)="openProject(project)">
+        {{ project.name }} - {{ project.description }}
+      </li>
+    </ul>
+
+    <h3>Create Project</h3>
+    <input [(ngModel)]="newProject.name" placeholder="Name" />
+    <input [(ngModel)]="newProject.description" placeholder="Description" />
+    <button (click)="create()">Create</button>

@@ -1,0 +1,33 @@
+<form (ngSubmit)="submit()" class="form-container">
+
+  <!-- Title -->
+  <label>Title</label>
+  <input [(ngModel)]="title" name="title" placeholder="Title" required /><br><br>
+
+  <!-- Date -->
+  <label>Date</label>
+  <input [(ngModel)]="date" name="date" type="date" required /><br><br>
+
+  <!-- Tags -->
+  <label>Tags</label>
+  <input [(ngModel)]="tags" name="tags" placeholder="Tags (comma separated)" /><br><br>
+
+  <!-- Method -->
+  <label>Method</label>
+  <quill-editor [(ngModel)]="method" name="method"></quill-editor><br><br>
+
+  <!-- Observations -->
+  <label>Observations</label>
+  <quill-editor [(ngModel)]="observations" name="observations"></quill-editor><br><br>
+
+  <!-- Results -->
+  <label>Results</label>
+  <quill-editor [(ngModel)]="results" name="results"></quill-editor><br><br>
+
+  <!-- Conclusion -->
+  <label>Conclusion</label>
+  <quill-editor [(ngModel)]="conclusion" name="conclusion"></quill-editor><br><br>
+
+  <button type="submit">Save Experiment</button>
+
+</form>

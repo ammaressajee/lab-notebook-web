@@ -1,0 +1,43 @@
+<h2>Create Experiment Type</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+
+  <mat-form-field appearance="fill">
+    <mat-label>Blueprint Name</mat-label>
+    <input matInput formControlName="name" placeholder="e.g., Cell Study">
+  </mat-form-field>
+
+  <div formArrayName="fields" style="margin-top: 1rem;">
+    <div *ngFor="let field of fields.controls; let i = index" [formGroupName]="i" style="border:1px solid #ccc; padding:1rem; margin-bottom:1rem;">
+      <mat-form-field appearance="fill">
+        <mat-label>Field Name</mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Field Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option *ngFor="let type of fieldTypes" [value]="type">{{type}}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" *ngIf="field.get('type')?.value === 'select'">
+        <mat-label>Options (comma separated)</mat-label>
+        <input matInput formControlName="options">
+      </mat-form-field>
+
+      <mat-form-field appearance="fill">
+        <mat-label>Required</mat-label>
+        <mat-select formControlName="required">
+          <mat-option [value]="true">Yes</mat-option>
+          <mat-option [value]="false">No</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="warn" type="button" (click)="removeField(i)">Remove Field</button>
+    </div>
+  </div>
+
+  <button mat-raised-button color="primary" type="button" (click)="addField()">+ Add Field</button>
+  <button mat-raised-button color="accent" type="submit">Save Blueprint</button>
+
+</form>

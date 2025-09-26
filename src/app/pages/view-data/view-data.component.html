@@ -1,0 +1,51 @@
+<div class="filters">
+  <input type="text" placeholder="Search LLM text" [(ngModel)]="searchText" />
+  <button class="btn search" (click)="loadExperiments()">Search</button>
+  <button class="btn clear" (click)="clearSearch()">Clear</button>
+</div>
+
+<div *ngFor="let exp of experiments" class="experiment-card" [class.expanded]="expandedExpId === exp.id">
+  <div class="exp-header" (click)="toggleExpand(exp.id)">
+    <h3>{{ exp.title }}</h3>
+    <span class="toggle-icon">{{ expandedExpId === exp.id ? '−' : '+' }}</span>
+  </div>
+
+  <div *ngIf="expandedExpId === exp.id" class="exp-details">
+    <p><strong>Date:</strong> {{ exp.date }}</p>
+    <p><strong>Tags:</strong> {{ exp.tags }}</p>
+
+    <div>
+      <strong>Method:</strong>
+      <div [innerHTML]="exp.method" class="html-content"></div>
+    </div>
+
+    <div>
+      <strong>Observations:</strong>
+      <div [innerHTML]="exp.observations" class="html-content"></div>
+    </div>
+
+    <div>
+      <strong>Results:</strong>
+      <div [innerHTML]="exp.results" class="html-content"></div>
+    </div>
+
+    <div>
+      <strong>Conclusion:</strong>
+      <div [innerHTML]="exp.conclusion" class="html-content"></div>
+    </div>
+
+    <div>
+      <strong>LLM Primed Data:</strong>
+      <div class="llm-text">{{ exp.llm_text }}</div>
+    </div>
+
+    <button (click)="analyzeExperiment(exp)" [disabled]="loadingExpId === exp.id">
+      {{ loadingExpId === exp.id ? 'Analyzing...' : 'Analyze with LLM' }}
+    </button>
+
+    <div *ngIf="exp.llm_response" class="llm-response">
+      <strong>LLM Response:</strong>
+      <p>{{ exp.llm_response }}</p>
+    </div>
+  </div>
+</div>
