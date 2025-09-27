@@ -1,15 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { ApiService } from '../../services/api.service';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+
 
 @Component({
   selector: 'app-experiment-type-create',
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, MatButtonModule, MatCardModule, MatIconModule, MatButtonToggleModule, FormsModule],
   templateUrl: './experiment-type-create.component.html',
   styleUrl: './experiment-type-create.component.scss'
 })
@@ -17,6 +21,7 @@ export class ExperimentTypeCreateComponent {
   form: FormGroup;
   fieldTypes = ['text', 'textarea', 'number', 'date', 'boolean', 'select', 'list'];
   experiment_types: any[] = [];
+  mode: 'create' | 'view' = 'create';  // default mode
 
   constructor(private fb: FormBuilder, private api: ApiService) {
     this.form = this.fb.group({
@@ -24,7 +29,7 @@ export class ExperimentTypeCreateComponent {
       fields: this.fb.array([])
     });
   }
-  
+
   ngOnInit() {
     this.loadExperimentTypes();
   }

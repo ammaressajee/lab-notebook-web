@@ -8,13 +8,32 @@
       {{ type.name }}
     </mat-option>
   </mat-select>
-</mat-form-field>
+</mat-form-field><br>
 
-<button mat-raised-button color="primary" (click)="createExperiment()">+ Create Experiment</button>
+<button mat-raised-button color="primary" (click)="createExperiment()">+ Create Experiment</button><br><br>
 
-<h3>Experiments</h3>
-<ul>
-  <li *ngFor="let exp of experiments">
-    {{ exp.title }} ({{ exp.experiment_type_name }})
-  </li>
-</ul>
+<mat-divider></mat-divider><br><br>
+<h2>Experiments</h2>
+
+<div *ngFor="let exp of experiments" class="experiment-card">
+  <!-- Header: clickable to expand/collapse -->
+  <div class="experiment-header" (click)="exp.expanded = !exp.expanded">
+    <span class="title">{{ exp.title }}</span>
+    <span class="type">({{ exp.experiment_type_name }})</span>
+    <span class="toggle-icon">{{ exp.expanded ? '▲' : '▼' }}</span>
+  </div>
+
+  <!-- Expanded content -->
+  <div class="experiment-details" *ngIf="exp.expanded">
+    <table class="details-table">
+      <tbody>
+        <tr *ngFor="let key of getDataKeys(exp.data)">
+          <td class="field-name">{{ key }}</td>
+          <td class="field-value">{{ exp.data[key] }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <p><strong>Notes:</strong> {{ exp.notes || 'No notes' }}</p>
+    <p><strong>Date:</strong> {{ exp.date | date:'medium' }}</p>
+  </div>
+</div>

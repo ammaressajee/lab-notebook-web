@@ -1,65 +1,112 @@
-<h2>Create Experiment Type</h2>
-<form [formGroup]="form" (ngSubmit)="submit()">
+<mat-button-toggle-group 
+  [(ngModel)]="mode" 
+  name="mode" 
+  aria-label="Mode switch" 
+  class="mode-toggle"
+  appearance="legacy">
+  
+  <mat-button-toggle value="create">
+    <mat-icon>add_circle</mat-icon>
+    Create Experiment Type
+  </mat-button-toggle>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Blueprint Name</mat-label>
-    <input matInput formControlName="name" placeholder="e.g., Cell Study">
-  </mat-form-field>
+  <mat-button-toggle value="view">
+    <mat-icon>view_list</mat-icon>
+    View Experiment Types
+  </mat-button-toggle>
+</mat-button-toggle-group>
 
-  <div formArrayName="fields" style="margin-top: 1rem;">
-    <div *ngFor="let field of fields.controls; let i = index" [formGroupName]="i"
-      style="border:1px solid #ccc; padding:1rem; margin-bottom:1rem;">
-      <mat-form-field appearance="fill">
-        <mat-label>Field Name</mat-label>
-        <input matInput formControlName="name">
+<div class="container">
+
+
+  <!-- CREATE MODE -->
+  <div *ngIf="mode === 'create'" class="create-section">
+    <h2>Create Blueprint for Experiment Type</h2>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="experiment-form">
+      <!-- Blueprint Name -->
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Blueprint Name</mat-label>
+        <input matInput formControlName="name" placeholder="e.g., Cell Study">
+        <mat-icon matSuffix>science</mat-icon>
+        <mat-error *ngIf="form.get('name')?.invalid && form.get('name')?.touched">
+          Blueprint name is required
+        </mat-error>
       </mat-form-field>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Field Type</mat-label>
-        <mat-select formControlName="type">
-          <mat-option *ngFor="let type of fieldTypes" [value]="type">{{type}}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <!-- Dynamic Fields -->
+      <div formArrayName="fields" class="fields-container">
+        <div *ngFor="let field of fields.controls; let i = index" [formGroupName]="i" class="field-card">
+          <div class="field-header">
+            <h4>Field {{ i + 1 }}</h4>
+            <button mat-icon-button color="warn" (click)="removeField(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
 
-      <mat-form-field appearance="fill" *ngIf="field.get('type')?.value === 'select'">
-        <mat-label>Options (comma separated)</mat-label>
-        <input matInput formControlName="options">
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Field Name</mat-label>
+            <input matInput formControlName="name" placeholder="Enter field name">
+          </mat-form-field>
 
-      <mat-form-field appearance="fill">
-        <mat-label>Required</mat-label>
-        <mat-select formControlName="required">
-          <mat-option [value]="true">Yes</mat-option>
-          <mat-option [value]="false">No</mat-option>
-        </mat-select>
-      </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Field Type</mat-label>
+            <mat-select formControlName="type">
+              <mat-option *ngFor="let type of fieldTypes" [value]="type">{{ type }}</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-      <button mat-raised-button color="warn" type="button" (click)="removeField(i)">Remove Field</button>
-    </div>
+          <mat-form-field appearance="outline" class="full-width" *ngIf="field.get('type')?.value === 'select'">
+            <mat-label>Options (comma separated)</mat-label>
+            <input matInput formControlName="options" placeholder="Option1, Option2, Option3">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Required</mat-label>
+            <mat-select formControlName="required">
+              <mat-option [value]="true">Yes</mat-option>
+              <mat-option [value]="false">No</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button mat-stroked-button color="primary" type="button" (click)="addField()">+ Add Field</button>
+        <button mat-raised-button color="accent" type="submit">Save Blueprint</button>
+      </div>
+    </form>
   </div>
 
-  <button mat-raised-button color="primary" type="button" (click)="addField()">+ Add Field</button>
-  <button mat-raised-button color="accent" type="submit">Save Blueprint</button>
+  <!-- VIEW MODE -->
+  <div *ngIf="mode === 'view'" class="view-section">
+    <h2 class="section-title">View All Existing Experiment Types</h2>
+    <div class="experiment-types-grid">
+      <mat-card *ngFor="let exp_type of experiment_types" class="experiment-type-card">
+        <mat-card-header>
+          <mat-card-title>{{ exp_type.name }}</mat-card-title>
+        </mat-card-header>
 
-</form>
-
-<div class="experiment-type-container">
-  <div *ngFor="let exp_type of experiment_types" class="experiment-type-card">
-    <h3>{{ exp_type.name }}</h3>
-
-    <table class="fields-table">
-      <thead>
-        <tr>
-          <th>Field Name</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let field of exp_type.fields">
-          <td>{{ field.name }}</td>
-          <td>{{ field.type }}</td>
-        </tr>
-      </tbody>
-    </table>
+        <mat-card-content>
+          <table class="fields-table">
+            <thead>
+              <tr>
+                <th>Field Name</th>
+                <th>Type</th>
+                <th>Required</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let field of exp_type.fields">
+                <td>{{ field.name }}</td>
+                <td>{{ field.type }}</td>
+                <td>{{ field.required ? 'Yes' : 'No' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    </div>
   </div>
 </div>

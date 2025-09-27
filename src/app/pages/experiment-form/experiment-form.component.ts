@@ -8,6 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-experiment-form',
@@ -17,7 +19,9 @@ import { ApiService } from '../../services/api.service';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatCheckboxModule],
+    MatCheckboxModule, 
+    MatIconModule, 
+    MatCardModule],
   templateUrl: './experiment-form.component.html',
   styleUrl: './experiment-form.component.scss'
 })
@@ -68,7 +72,7 @@ export class ExperimentFormComponent {
       this.fieldKeyMap[key] = f.name;
 
       const validators = f.required ? [Validators.required] : [];
-      switch(f.type) {
+      switch (f.type) {
         case 'number':
           dataGroup.addControl(key, this.fb.control(null, validators));
           break;

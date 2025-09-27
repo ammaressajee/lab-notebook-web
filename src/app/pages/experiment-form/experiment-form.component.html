@@ -1,71 +1,99 @@
-<h2>Create Experiment: {{ experimentType?.name }}</h2>
-<form [formGroup]="form" (ngSubmit)="submit()">
+<div class="experiment-container">
+  <mat-card class="experiment-card">
+    <mat-card-header>
+      <mat-card-title>Create Experiment: {{ experimentType?.name }}</mat-card-title>
+    </mat-card-header>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Title</mat-label>
-    <input matInput formControlName="title" placeholder="Experiment title">
-  </mat-form-field>
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="experiment-form">
 
-  <div formGroupName="data" *ngIf="experimentType?.fields?.length">
-    <div *ngFor="let f of experimentType.fields">
-      <ng-container [ngSwitch]="f.type">
-        <!-- Text -->
-        <mat-form-field appearance="fill" *ngSwitchCase="'text'">
-          <mat-label>{{f.name}}</mat-label>
-          <input matInput [formControlName]="normalizeKey(f.name)">
+        <!-- Title -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput formControlName="title" placeholder="Experiment title">
         </mat-form-field>
 
-        <!-- Textarea -->
-        <mat-form-field appearance="fill" *ngSwitchCase="'textarea'">
-          <mat-label>{{f.name}}</mat-label>
-          <textarea matInput [formControlName]="normalizeKey(f.name)"></textarea>
-        </mat-form-field>
+        <!-- Dynamic Fields -->
+        <div formGroupName="data" *ngIf="experimentType?.fields?.length" class="fields-section">
+          <h3 class="section-title">Experiment Data</h3>
 
-        <!-- Number -->
-        <mat-form-field appearance="fill" *ngSwitchCase="'number'">
-          <mat-label>{{f.name}}</mat-label>
-          <input matInput type="number" [formControlName]="normalizeKey(f.name)">
-        </mat-form-field>
+          <div *ngFor="let f of experimentType.fields" class="field-wrapper">
+            <ng-container [ngSwitch]="f.type">
 
-        <!-- Date -->
-        <mat-form-field appearance="fill" *ngSwitchCase="'date'">
-          <mat-label>{{f.name}}</mat-label>
-          <input matInput type="date" [formControlName]="normalizeKey(f.name)">
-        </mat-form-field>
+              <!-- Text -->
+              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'text'">
+                <mat-label>{{ f.name }}</mat-label>
+                <input matInput [formControlName]="normalizeKey(f.name)">
+              </mat-form-field>
 
-        <!-- Boolean -->
-        <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="normalizeKey(f.name)">
-          {{f.name}}
-        </mat-checkbox>
+              <!-- Textarea -->
+              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'textarea'">
+                <mat-label>{{ f.name }}</mat-label>
+                <textarea matInput [formControlName]="normalizeKey(f.name)" rows="3"></textarea>
+              </mat-form-field>
 
-        <!-- Select -->
-        <mat-form-field appearance="fill" *ngSwitchCase="'select'">
-          <mat-label>{{f.name}}</mat-label>
-          <mat-select [formControlName]="normalizeKey(f.name)">
-            <mat-option *ngFor="let o of f.options" [value]="o">{{o}}</mat-option>
-          </mat-select>
-        </mat-form-field>
+              <!-- Number -->
+              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'number'">
+                <mat-label>{{ f.name }}</mat-label>
+                <input matInput type="number" [formControlName]="normalizeKey(f.name)">
+              </mat-form-field>
 
-        <!-- List -->
-        <div *ngSwitchCase="'list'">
-          <label>{{f.name}} (multiple)</label>
-          <div formArrayName="{{normalizeKey(f.name)}}">
-            <div *ngFor="let c of getListControls(normalizeKey(f.name)).controls; let i=index">
-              <input [formControlName]="i">
-              <button mat-button color="warn" type="button" (click)="removeListItem(normalizeKey(f.name), i)">Remove</button>
-            </div>
-            <button mat-button type="button" (click)="addListItem(normalizeKey(f.name))">Add Item</button>
+              <!-- Date -->
+              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'date'">
+                <mat-label>{{ f.name }}</mat-label>
+                <input matInput type="date" [formControlName]="normalizeKey(f.name)">
+              </mat-form-field>
+
+              <!-- Boolean -->
+              <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="normalizeKey(f.name)">
+                {{ f.name }}
+              </mat-checkbox>
+
+              <!-- Select -->
+              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'select'">
+                <mat-label>{{ f.name }}</mat-label>
+                <mat-select [formControlName]="normalizeKey(f.name)">
+                  <mat-option *ngFor="let o of f.options" [value]="o">{{ o }}</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <!-- List -->
+              <div *ngSwitchCase="'list'" class="list-field">
+                <h4>{{ f.name }} (multiple)</h4>
+                <div formArrayName="{{ normalizeKey(f.name) }}">
+                  <div *ngFor="let c of getListControls(normalizeKey(f.name)).controls; let i=index" class="list-item">
+                    <mat-form-field appearance="outline" class="list-input">
+                      <input matInput [formControlName]="i" placeholder="Item {{i + 1}}">
+                    </mat-form-field>
+                    <button mat-icon-button color="warn" type="button"
+                      (click)="removeListItem(normalizeKey(f.name), i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                  <button mat-stroked-button type="button" (click)="addListItem(normalizeKey(f.name))">
+                    <mat-icon>add</mat-icon> Add Item
+                  </button>
+                </div>
+              </div>
+
+            </ng-container>
           </div>
         </div>
 
-      </ng-container>
-    </div>
-  </div>
+        <!-- Notes -->
+        <mat-form-field appearance="outline" class="full-width notes-field">
+          <mat-label>Notes</mat-label>
+          <textarea matInput formControlName="notes" rows="4"></textarea>
+        </mat-form-field>
 
-  <mat-form-field appearance="fill">
-    <mat-label>Notes</mat-label>
-    <textarea matInput formControlName="notes"></textarea>
-  </mat-form-field>
+        <!-- Save Button -->
+        <div class="actions">
+          <button mat-raised-button color="primary" type="submit">
+            <mat-icon>save</mat-icon> Save Experiment
+          </button>
+        </div>
 
-  <button mat-raised-button color="primary" type="submit">Save Experiment</button>
-</form>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

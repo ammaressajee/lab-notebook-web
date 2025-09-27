@@ -1,11 +1,36 @@
-<h1>Projects</h1>
-    <ul>
-      <li *ngFor="let project of projects" (click)="openProject(project)">
-        {{ project.name }} - {{ project.description }}
-      </li>
-    </ul>
+<div class="container">
+  <h1>Projects</h1>
 
-    <h3>Create Project</h3>
-    <input [(ngModel)]="newProject.name" placeholder="Name" />
-    <input [(ngModel)]="newProject.description" placeholder="Description" />
-    <button (click)="create()">Create</button>
+  <!-- Projects Grid -->
+  <div class="projects-grid">
+    <mat-card
+      *ngFor="let project of projects"
+      class="project-card"
+      (click)="openProject(project)"
+      matRipple
+    >
+      <mat-card-title>{{ project.name }}</mat-card-title>
+      <mat-card-subtitle>{{ project.description }}</mat-card-subtitle>
+      <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+
+    </mat-card>
+  </div>
+
+  <mat-divider></mat-divider><br><br>
+
+  <!-- Create Project Form -->
+  <h1>Create New Project</h1>
+  <form class="project-form" (ngSubmit)="create()">
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Project Name</mat-label>
+      <input matInput [(ngModel)]="newProject.name" name="name" required />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput [(ngModel)]="newProject.description" name="description"></textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Create Project</button>
+  </form>
+</div>

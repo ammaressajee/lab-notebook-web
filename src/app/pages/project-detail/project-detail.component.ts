@@ -6,10 +6,11 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOption, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatOption, MatSelectModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatOption, MatSelectModule, MatButtonModule, MatDividerModule],
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.scss'
 })
@@ -29,11 +30,29 @@ export class ProjectDetailComponent {
   }
 
   loadExperiments() {
-    this.api.getExperiments(this.projectId).subscribe(res => this.experiments = res);
+    this.api.getExperiments(this.projectId).subscribe(res => {
+      // Initialize expanded state for each experiment
+      this.experiments = res.map(exp => ({ ...exp, expanded: false }));
+    });
   }
 
   loadExperimentTypes() {
-    this.api.getExperimentTypes().subscribe(res => this.experimentTypes = res);
+    this.api.getExperimentTypes().subscribe(res => {
+      this.experimentTypes = res;
+    });
+  }
+
+  toggleExperiment(exp: any) {
+    exp.expanded = !exp.expanded;
+  }
+
+  getDataKeys(data: any): string[] {
+    return data ? Object.keys(data) : [];
+  }
+
+  getExperimentTypeName(exp: any): string {
+    const type = this.experimentTypes.find(t => t.id === exp.experiment_type_id);
+    return type ? type.name : 'Unknown';
   }
 
   createExperiment() {
