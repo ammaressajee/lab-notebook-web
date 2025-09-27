@@ -1,51 +1,51 @@
- <h2 mat-dialog-title>Set Default Values - {{ data.name }}</h2>
-    <mat-dialog-content [formGroup]="form" class="dialog-content">
+<h2 mat-dialog-title class="dialog-title">
+  Set Default Values - {{ data.name }}
+</h2>
 
-      <div *ngFor="let field of data.fields" class="field">
-        <ng-container [ngSwitch]="field.type">
+<mat-dialog-content [formGroup]="form" class="dialog-content">
 
-          <!-- Text -->
-          <mat-form-field *ngSwitchCase="'text'" appearance="outline" class="full-width">
-            <mat-label>{{ field.name }}</mat-label>
-            <input matInput [formControlName]="field.name">
-          </mat-form-field>
+  <div *ngFor="let field of data.fields" class="field-card">
+    <ng-container [ngSwitch]="field.type">
 
-          <!-- Textarea -->
-          <mat-form-field *ngSwitchCase="'textarea'" appearance="outline" class="full-width">
-            <mat-label>{{ field.name }}</mat-label>
-            <textarea matInput [formControlName]="field.name"></textarea>
-          </mat-form-field>
+      <!-- Text / Textarea / Number / Date / Select -->
+      <mat-form-field appearance="fill" class="modern-field" *ngSwitchCase="'text'">
+        <mat-label>{{ field.name }}</mat-label>
+        <input matInput [formControlName]="field.name" placeholder="Enter value">
+      </mat-form-field>
 
-          <!-- Number -->
-          <mat-form-field *ngSwitchCase="'number'" appearance="outline" class="full-width">
-            <mat-label>{{ field.name }}</mat-label>
-            <input matInput type="number" [formControlName]="field.name">
-          </mat-form-field>
+      <mat-form-field appearance="fill" class="modern-field" *ngSwitchCase="'textarea'">
+        <mat-label>{{ field.name }}</mat-label>
+        <textarea matInput [formControlName]="field.name" rows="3" placeholder="Enter text"></textarea>
+      </mat-form-field>
 
-          <!-- Date -->
-          <mat-form-field *ngSwitchCase="'date'" appearance="outline" class="full-width">
-            <mat-label>{{ field.name }}</mat-label>
-            <input matInput type="date" [formControlName]="field.name">
-          </mat-form-field>
+      <mat-form-field appearance="fill" class="modern-field" *ngSwitchCase="'number'">
+        <mat-label>{{ field.name }}</mat-label>
+        <input matInput type="number" [formControlName]="field.name" placeholder="Enter number">
+      </mat-form-field>
 
-          <!-- Boolean -->
-          <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="field.name">
-            {{ field.name }}
-          </mat-checkbox>
+      <mat-form-field appearance="fill" class="modern-field" *ngSwitchCase="'date'">
+        <mat-label>{{ field.name }}</mat-label>
+        <input matInput type="date" [formControlName]="field.name">
+      </mat-form-field>
 
-          <!-- Select -->
-          <mat-form-field *ngSwitchCase="'select'" appearance="outline" class="full-width">
-            <mat-label>{{ field.name }}</mat-label>
-            <mat-select [formControlName]="field.name">
-              <mat-option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</mat-option>
-            </mat-select>
-          </mat-form-field>
+      <mat-form-field appearance="fill" class="modern-field" *ngSwitchCase="'select'">
+        <mat-label>{{ field.name }}</mat-label>
+        <mat-select [formControlName]="field.name">
+          <mat-option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-        </ng-container>
-      </div>
-    </mat-dialog-content>
+      <!-- Boolean -->
+      <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="field.name" class="modern-checkbox">
+        {{ field.name }}
+      </mat-checkbox>
 
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="close()">Cancel</button>
-      <button mat-raised-button color="primary" (click)="save()">Save</button>
-    </mat-dialog-actions>
+    </ng-container>
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end" class="dialog-actions">
+  <button mat-stroked-button class="cancel-btn" (click)="close()">Cancel</button>
+  <button mat-flat-button color="primary" class="save-btn" (click)="save()">Save</button>
+</mat-dialog-actions>

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, QueryList, ViewChildren } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,18 +31,26 @@ import { ApiService } from '../../services/api.service';
   templateUrl: './experiment-form.component.html',
   styleUrl: './experiment-form.component.scss'
 })
-export class ExperimentFormComponent implements OnInit{
+export class ExperimentFormComponent implements OnInit {
   form: FormGroup;
   projectId!: number;
   experimentTypeId!: number;
-  experimentFields: any[] = [];
+  projectName: string = 'Loading Project...';
+  experimentTypeName: string = '';
+  experimentType: any;
   fieldKeyMap: Record<string, string> = {};
+  pickers: Record<string, any> = {};
+
+  @ViewChildren('datepicker') pickerRefs!: QueryList<any>;
+
+  currentDate = new Date();
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private api: ApiService
+    private api: ApiService,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       notes: [''],
@@ -53,22 +61,31 @@ export class ExperimentFormComponent implements OnInit{
   ngOnInit() {
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
     this.experimentTypeId = Number(this.route.snapshot.paramMap.get('typeId'));
-    this.loadExperimentFields();
+    this.loadProjectInfo();
+    this.loadBlueprint();
+  }
+
+  ngAfterViewInit() {
+    this.dataKeys.forEach((key, idx) => {
+      const picker = this.pickerRefs.toArray()[idx];
+      if (picker) this.pickers[key] = picker;
+    });
+    this.cdr.detectChanges(); // fixes ExpressionChangedAfterItHasBeenCheckedError
   }
 
   get dataKeys() {
-    return Object.keys((this.form.get('data') as FormGroup).controls);
+    return Object.keys(this.form.get('data')?.value || {});
   }
 
-  getFieldType(key: string): string {
+  getFieldType(key: string) {
     const originalName = this.fieldKeyMap[key];
-    const field = this.experimentFields.find(f => f.name === originalName);
+    const field = this.experimentType?.fields?.find((f: any) => f.name === originalName);
     return field?.type || 'text';
   }
 
-  getFieldOptions(key: string): string[] {
+  getFieldOptions(key: string) {
     const originalName = this.fieldKeyMap[key];
-    const field = this.experimentFields.find(f => f.name === originalName);
+    const field = this.experimentType?.fields?.find((f: any) => f.name === originalName);
     return field?.options || [];
   }
 
@@ -88,25 +105,39 @@ export class ExperimentFormComponent implements OnInit{
     return name.replace(/\s+/g, '_').toLowerCase();
   }
 
-  loadExperimentFields() {
-    // Get experiment fields
+  loadProjectInfo() {
+    this.api.getProjects().subscribe(projects => {
+      const project = projects.find(p => p.id === this.projectId);
+      if (project) this.projectName = project.name;
+    });
+  }
+
+  loadBlueprint() {
     this.api.getExperimentTypes().subscribe(types => {
       const experimentType = types.find(t => t.id === this.experimentTypeId);
       if (!experimentType) return;
+      this.experimentType = experimentType;
+      this.experimentTypeName = experimentType.name;
 
-      this.experimentFields = experimentType.fields;
+      // Step 1: build form
       this.buildForm(experimentType.fields);
 
-      // Get defaults separately
+      // Step 2: fetch defaults
       this.api.getExperimentTypeDefaults(this.experimentTypeId).subscribe(res => {
         const defaults = res.defaults || {};
         const patch: any = {};
+
         Object.keys(defaults).forEach(fName => {
           const key = this.normalizeKey(fName);
-          patch[key] = defaults[fName];
+          const type = this.getFieldType(key);
+          patch[key] = type === 'date' && defaults[fName] ? new Date(defaults[fName]) : defaults[fName];
         });
-        (this.form.get('data') as FormGroup).patchValue(patch);
-        console.log('Form after patch:', this.form.value);
+
+        setTimeout(() => {
+          this.form.get('data')?.patchValue(patch);
+          this.form.get('notes')?.patchValue(experimentType.default_data?.notes || '');
+          this.cdr.detectChanges();
+        });
       });
     });
   }
@@ -118,11 +149,12 @@ export class ExperimentFormComponent implements OnInit{
     fields.forEach(f => {
       const key = this.normalizeKey(f.name);
       this.fieldKeyMap[key] = f.name;
-
       const validators = f.required ? [Validators.required] : [];
 
       switch (f.type) {
         case 'number':
+          dataGroup.addControl(key, this.fb.control(null, validators));
+          break;
         case 'date':
           dataGroup.addControl(key, this.fb.control(null, validators));
           break;
@@ -131,10 +163,6 @@ export class ExperimentFormComponent implements OnInit{
           break;
         case 'select':
           dataGroup.addControl(key, this.fb.control(f.options?.[0] || null, validators));
-          break;
-        case 'list':
-          const arr = this.fb.array([]);
-          dataGroup.addControl(key, arr);
           break;
         case 'textarea':
         default:
@@ -153,8 +181,11 @@ export class ExperimentFormComponent implements OnInit{
 
     const raw = this.form.value;
     const data: Record<string, any> = {};
+
     Object.keys(raw.data).forEach(k => {
-      data[this.fieldKeyMap[k]] = raw.data[k];
+      const value = raw.data[k];
+      const type = this.getFieldType(k);
+      data[this.fieldKeyMap[k]] = type === 'date' && value ? new Date(value).toISOString() : value;
     });
 
     const payload = {

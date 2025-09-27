@@ -1,16 +1,19 @@
-<mat-card>
-  <form [formGroup]="form" (ngSubmit)="submit()" class="experiment-form">
+<mat-card class="experiment-card">
+  <!-- Header -->
+  <div class="experiment-header">
+    <h2 class="experiment-title">{{ experimentTypeName || 'New Experiment' }}</h2>
+    <div class="project-info">
+      <span class="project-name">Project: {{ projectName }}</span>
+      <span class="project-date">Date: {{ currentDate | date:'mediumDate' }}</span>
+    </div>
+  </div>
 
-    <!-- Notes Field -->
-    <mat-form-field appearance="fill" class="full-width">
-      <mat-label>Notes</mat-label>
-      <textarea matInput formControlName="notes" rows="3"></textarea>
-    </mat-form-field>
+  <!-- Form -->
+  <form [formGroup]="form" (ngSubmit)="submit()" class="experiment-form">
 
     <!-- Dynamic Fields -->
     <div formGroupName="data" class="dynamic-fields">
       <ng-container *ngFor="let key of dataKeys">
-
         <ng-container [ngSwitch]="getFieldType(key)">
 
           <!-- Textarea -->
@@ -31,16 +34,16 @@
             <input matInput type="number" [formControlName]="key" />
           </mat-form-field>
 
-          <!-- Date Picker -->
+          <!-- Date -->
           <mat-form-field *ngSwitchCase="'date'" appearance="fill" class="full-width">
             <mat-label>{{ fieldKeyMap[key] }}</mat-label>
-            <input matInput [formControlName]="key" />
-            <mat-datepicker-toggle matSuffix ></mat-datepicker-toggle>
-            <mat-datepicker #picker_{{key}}></mat-datepicker>
+            <input matInput [matDatepicker]="pickers[key]" [formControlName]="key" />
+            <mat-datepicker-toggle matSuffix [for]="pickers[key]"></mat-datepicker-toggle>
+            <mat-datepicker touchUi #datepicker></mat-datepicker>
           </mat-form-field>
 
-          <!-- Boolean / Checkbox -->
-          <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="key" class="mb-2">
+          <!-- Checkbox -->
+          <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="key">
             {{ fieldKeyMap[key] }}
           </mat-checkbox>
 
@@ -48,20 +51,22 @@
           <mat-form-field *ngSwitchCase="'select'" appearance="fill" class="full-width">
             <mat-label>{{ fieldKeyMap[key] }}</mat-label>
             <mat-select [formControlName]="key">
-              <mat-option *ngFor="let option of getFieldOptions(key)" [value]="option">{{ option }}</mat-option>
+              <mat-option *ngFor="let option of getFieldOptions(key)" [value]="option">
+                {{ option }}
+              </mat-option>
             </mat-select>
           </mat-form-field>
 
-          <!-- List / Array -->
+          <!-- List -->
           <div *ngSwitchCase="'list'" class="list-field">
             <label>{{ fieldKeyMap[key] }}</label>
             <div formArrayName="{{key}}">
-              <div *ngFor="let ctrl of getListControls(key).controls; let i = index" class="list-item"
-                [formGroupName]="i">
+              <div *ngFor="let ctrl of getListControls(key).controls; let i=index" [formGroupName]="i"
+                class="list-item">
                 <mat-form-field appearance="fill" class="list-input">
-                  <input matInput [formControlName]="i" placeholder="Item {{ i + 1 }}" />
+                  <input matInput [formControlName]="i" placeholder="Item {{i+1}}" />
                 </mat-form-field>
-                <button mat-icon-button type="button" color="warn" (click)="removeListItem(key, i)">
+                <button mat-icon-button color="warn" type="button" (click)="removeListItem(key, i)">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -73,10 +78,15 @@
       </ng-container>
     </div>
 
+    <!-- Notes -->
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Notes</mat-label>
+      <textarea matInput formControlName="notes" rows="3"></textarea>
+    </mat-form-field>
+    
     <!-- Submit Button -->
-    <div class="form-actions mt-4">
+    <div class="form-actions">
       <button mat-raised-button color="primary" type="submit">Save Experiment</button>
     </div>
-
   </form>
 </mat-card>

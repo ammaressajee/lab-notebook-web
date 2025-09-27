@@ -21,7 +21,7 @@ import { ExperimentDefaultsDialogComponent } from '../../components/experiment-d
 })
 export class ExperimentTypeCreateComponent {
   form: FormGroup;
-  fieldTypes = ['text', 'textarea', 'number', 'date', 'boolean', 'select', 'list'];
+  fieldTypes = ['text', 'textarea', 'number', 'date', 'boolean', 'select'];
   experiment_types: any[] = [];
   mode: 'create' | 'view' = 'create';  // default mode
 
@@ -106,14 +106,28 @@ export class ExperimentTypeCreateComponent {
   }
 
   loadExperimentTypes() {
-    this.api.getExperimentTypes().subscribe({
-      next: (res) => {
-        this.experiment_types = res;
-      },
-      error: (err) => {
-        console.error('Failed to load experiment types', err);
-      }
-    });
-  }
+  this.api.getExperimentTypes().subscribe({
+    next: (res) => {
+      this.experiment_types = res;
+
+      // Fetch defaults for each type
+      this.experiment_types.forEach((exp_type) => {
+        this.api.getExperimentTypeDefaults(exp_type.id).subscribe({
+          next: (res) => {
+            exp_type.defaults = res.defaults || {};
+          },
+          error: (err) => {
+            console.error(`Failed to fetch defaults for ${exp_type.name}`, err);
+            exp_type.defaults = {};
+          }
+        });
+      });
+    },
+    error: (err) => {
+      console.error('Failed to load experiment types', err);
+    }
+  });
+}
+
 }
 

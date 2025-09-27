@@ -6,10 +6,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-experiment-defaults-dialog',
-  imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, MatCheckboxModule, MatInputModule, ReactiveFormsModule, CommonModule],
+  imports: [MatDialogModule, MatFormFieldModule, MatSelectModule, MatCheckboxModule, MatInputModule, ReactiveFormsModule, CommonModule, MatIconModule, MatButtonModule],
   templateUrl: './experiment-defaults-dialog.component.html',
   styleUrl: './experiment-defaults-dialog.component.scss'
 })

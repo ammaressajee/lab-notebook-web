@@ -1,58 +1,84 @@
-.experiment-container {
-  display: flex;
-  justify-content: center;
-  padding: 2rem;
-}
-
 .experiment-card {
-  width: 100%;
-  max-width: 1200px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-}
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fdfbfb, #ebedee);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px);
+  }
 
-.experiment-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
+  .experiment-header {
+    margin-bottom: 2rem;
+    text-align: center;
 
-.full-width {
-  width: 100%;
-}
+    .experiment-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 2rem;
+      color: #333;
+      margin-bottom: 0.5rem;
+    }
 
-.section-title {
-  margin: 1rem 0 0.5rem;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: #444;
-}
+    .project-info {
+      font-family: 'Roboto', sans-serif;
+      font-size: 0.95rem;
+      color: #555;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      span {
+        background: rgba(0,0,0,0.03);
+        padding: 0.3rem 0.8rem;
+        border-radius: 12px;
+      }
+    }
+  }
 
-.field-wrapper {
-  margin-bottom: 1rem;
-}
+  .experiment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 
-.list-field {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 1rem;
-  background: #fafafa;
-}
+    .full-width {
+      width: 100%;
+    }
 
-.list-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
+    .list-field {
+      background: rgba(255, 255, 255, 0.6);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
 
-.list-input {
-  flex: 1;
-}
+      .list-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
 
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1.5rem;
+        .list-input {
+          flex: 1;
+        }
+      }
+
+      button {
+        align-self: flex-end;
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 1.5rem;
+
+      button {
+        font-weight: 600;
+        padding: 0.8rem 2rem;
+        font-size: 1rem;
+      }
+    }
+  }
 }
