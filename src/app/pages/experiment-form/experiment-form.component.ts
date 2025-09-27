@@ -1,37 +1,42 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-experiment-form',
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatCheckboxModule, 
-    MatIconModule, 
-    MatCardModule],
+    MatCheckboxModule,
+    MatCardModule,
+    MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule
+  ],
   templateUrl: './experiment-form.component.html',
   styleUrl: './experiment-form.component.scss'
 })
-export class ExperimentFormComponent {
-
+export class ExperimentFormComponent implements OnInit{
   form: FormGroup;
   projectId!: number;
   experimentTypeId!: number;
-  experimentType: any;
-  fieldKeyMap: Record<string, string> = {}; // normalized key => original field name
+  experimentFields: any[] = [];
+  fieldKeyMap: Record<string, string> = {};
 
   constructor(
     private fb: FormBuilder,
@@ -40,7 +45,6 @@ export class ExperimentFormComponent {
     private api: ApiService
   ) {
     this.form = this.fb.group({
-      title: ['', Validators.required],
       notes: [''],
       data: this.fb.group({})
     });
@@ -49,52 +53,23 @@ export class ExperimentFormComponent {
   ngOnInit() {
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
     this.experimentTypeId = Number(this.route.snapshot.paramMap.get('typeId'));
-    this.loadBlueprint();
+    this.loadExperimentFields();
   }
 
-  loadBlueprint() {
-    this.api.getExperimentTypeFields(this.experimentTypeId).subscribe((res) => {
-      this.experimentType = res;
-      this.buildForm(res.fields);
-    });
+  get dataKeys() {
+    return Object.keys((this.form.get('data') as FormGroup).controls);
   }
 
-  public normalizeKey(name: string) {
-    return name.replace(/\s+/g, '_').toLowerCase();
+  getFieldType(key: string): string {
+    const originalName = this.fieldKeyMap[key];
+    const field = this.experimentFields.find(f => f.name === originalName);
+    return field?.type || 'text';
   }
 
-  buildForm(fields: any[]) {
-    const dataGroup = this.fb.group({});
-    this.fieldKeyMap = {};
-
-    fields.forEach(f => {
-      const key = this.normalizeKey(f.name);
-      this.fieldKeyMap[key] = f.name;
-
-      const validators = f.required ? [Validators.required] : [];
-      switch (f.type) {
-        case 'number':
-          dataGroup.addControl(key, this.fb.control(null, validators));
-          break;
-        case 'date':
-          dataGroup.addControl(key, this.fb.control(null, validators));
-          break;
-        case 'boolean':
-          dataGroup.addControl(key, this.fb.control(false, validators));
-          break;
-        case 'select':
-          dataGroup.addControl(key, this.fb.control(f.options?.[0] || null, validators));
-          break;
-        case 'list':
-          dataGroup.addControl(key, this.fb.array([]));
-          break;
-        case 'textarea':
-        default:
-          dataGroup.addControl(key, this.fb.control('', validators));
-      }
-    });
-
-    this.form.setControl('data', dataGroup);
+  getFieldOptions(key: string): string[] {
+    const originalName = this.fieldKeyMap[key];
+    const field = this.experimentFields.find(f => f.name === originalName);
+    return field?.options || [];
   }
 
   getListControls(key: string): FormArray {
@@ -107,6 +82,67 @@ export class ExperimentFormComponent {
 
   removeListItem(key: string, index: number) {
     this.getListControls(key).removeAt(index);
+  }
+
+  normalizeKey(name: string) {
+    return name.replace(/\s+/g, '_').toLowerCase();
+  }
+
+  loadExperimentFields() {
+    // Get experiment fields
+    this.api.getExperimentTypes().subscribe(types => {
+      const experimentType = types.find(t => t.id === this.experimentTypeId);
+      if (!experimentType) return;
+
+      this.experimentFields = experimentType.fields;
+      this.buildForm(experimentType.fields);
+
+      // Get defaults separately
+      this.api.getExperimentTypeDefaults(this.experimentTypeId).subscribe(res => {
+        const defaults = res.defaults || {};
+        const patch: any = {};
+        Object.keys(defaults).forEach(fName => {
+          const key = this.normalizeKey(fName);
+          patch[key] = defaults[fName];
+        });
+        (this.form.get('data') as FormGroup).patchValue(patch);
+        console.log('Form after patch:', this.form.value);
+      });
+    });
+  }
+
+  buildForm(fields: any[]) {
+    const dataGroup = this.fb.group({});
+    this.fieldKeyMap = {};
+
+    fields.forEach(f => {
+      const key = this.normalizeKey(f.name);
+      this.fieldKeyMap[key] = f.name;
+
+      const validators = f.required ? [Validators.required] : [];
+
+      switch (f.type) {
+        case 'number':
+        case 'date':
+          dataGroup.addControl(key, this.fb.control(null, validators));
+          break;
+        case 'boolean':
+          dataGroup.addControl(key, this.fb.control(false, validators));
+          break;
+        case 'select':
+          dataGroup.addControl(key, this.fb.control(f.options?.[0] || null, validators));
+          break;
+        case 'list':
+          const arr = this.fb.array([]);
+          dataGroup.addControl(key, arr);
+          break;
+        case 'textarea':
+        default:
+          dataGroup.addControl(key, this.fb.control('', validators));
+      }
+    });
+
+    this.form.setControl('data', dataGroup);
   }
 
   submit() {
@@ -124,7 +160,6 @@ export class ExperimentFormComponent {
     const payload = {
       project_id: this.projectId,
       experiment_type_id: this.experimentTypeId,
-      title: raw.title,
       notes: raw.notes,
       data
     };
@@ -134,8 +169,7 @@ export class ExperimentFormComponent {
         alert('Experiment saved!');
         this.router.navigate(['/projects', this.projectId]);
       },
-      error: (err: any) => console.error(err)
+      error: err => console.error(err)
     });
   }
-
 }

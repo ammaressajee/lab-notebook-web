@@ -30,6 +30,17 @@ export class ApiService {
     return this.http.get<any>(`${this.baseUrl}/experiment_types/${id}/fields`);
   }
 
+  // api.service.ts
+  getExperimentTypeDefaults(experimentTypeId: number): Observable<{ experiment_type_id: number, defaults: any }> {
+    return this.http.get<{ experiment_type_id: number, defaults: any }>(
+      `${this.baseUrl}/experiment_types/${experimentTypeId}/defaults`
+    );
+  }
+
+  setExperimentTypeDefaults(id: number, defaults: any) {
+    return this.http.post(`${this.baseUrl}/experiment_types/${id}/defaults`
+      , { defaults });
+  }
   // Experiments
   getExperiments(projectId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/projects/${projectId}/experiments`);

@@ -9,6 +9,8 @@ import { ApiService } from '../../services/api.service';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDialog } from '@angular/material/dialog';
+import { ExperimentDefaultsDialogComponent } from '../../components/experiment-defaults-dialog/experiment-defaults-dialog.component';
 
 
 @Component({
@@ -23,7 +25,7 @@ export class ExperimentTypeCreateComponent {
   experiment_types: any[] = [];
   mode: 'create' | 'view' = 'create';  // default mode
 
-  constructor(private fb: FormBuilder, private api: ApiService) {
+  constructor(private fb: FormBuilder, private api: ApiService, private dialog: MatDialog) {
     this.form = this.fb.group({
       name: ['', Validators.required],
       fields: this.fb.array([])
@@ -43,13 +45,35 @@ export class ExperimentTypeCreateComponent {
       name: ['', Validators.required],
       type: ['text', Validators.required],
       required: [false],
-      options: [''] // comma-separated options for select
+      options: [''], // comma-separated options for select
+      default: ['']
     }));
   }
 
   removeField(index: number) {
     this.fields.removeAt(index);
   }
+
+  openDefaultsDialog(exp_type: any) {
+    const dialogRef = this.dialog.open(ExperimentDefaultsDialogComponent, {
+      width: '500px',
+      data: exp_type
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Save defaults to backend
+        this.api.setExperimentTypeDefaults(exp_type.id, result).subscribe({
+          next: () => {
+            alert('Default values saved!');
+            this.loadExperimentTypes();
+          },
+          error: (err) => console.error('Failed to save defaults', err)
+        });
+      }
+    });
+  }
+
 
   submit() {
     if (this.form.invalid) {
@@ -63,16 +87,19 @@ export class ExperimentTypeCreateComponent {
         name: f.name,
         type: f.type,
         required: f.required,
-        options: f.type === 'select' && f.options ? f.options.split(',').map((s: string) => s.trim()).filter(Boolean) : undefined
+        options: f.type === 'select' && f.options
+          ? f.options.split(',').map((s: string) => s.trim()).filter(Boolean)
+          : undefined
       }))
     };
 
     this.api.createExperimentType(payload).subscribe({
-      next: (res: any) => {
+      next: () => {
         alert('Experiment type created successfully!');
         this.form.reset();
         this.fields.clear();
         this.loadExperimentTypes();
+        this.mode = 'view'; // switch to view after creating
       },
       error: (err: any) => console.error(err)
     });
@@ -84,8 +111,9 @@ export class ExperimentTypeCreateComponent {
         this.experiment_types = res;
       },
       error: (err) => {
-        console.error("Failed to load experiment types", err);
+        console.error('Failed to load experiment types', err);
       }
     });
   }
 }
+

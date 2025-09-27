@@ -1,0 +1,51 @@
+ <h2 mat-dialog-title>Set Default Values - {{ data.name }}</h2>
+    <mat-dialog-content [formGroup]="form" class="dialog-content">
+
+      <div *ngFor="let field of data.fields" class="field">
+        <ng-container [ngSwitch]="field.type">
+
+          <!-- Text -->
+          <mat-form-field *ngSwitchCase="'text'" appearance="outline" class="full-width">
+            <mat-label>{{ field.name }}</mat-label>
+            <input matInput [formControlName]="field.name">
+          </mat-form-field>
+
+          <!-- Textarea -->
+          <mat-form-field *ngSwitchCase="'textarea'" appearance="outline" class="full-width">
+            <mat-label>{{ field.name }}</mat-label>
+            <textarea matInput [formControlName]="field.name"></textarea>
+          </mat-form-field>
+
+          <!-- Number -->
+          <mat-form-field *ngSwitchCase="'number'" appearance="outline" class="full-width">
+            <mat-label>{{ field.name }}</mat-label>
+            <input matInput type="number" [formControlName]="field.name">
+          </mat-form-field>
+
+          <!-- Date -->
+          <mat-form-field *ngSwitchCase="'date'" appearance="outline" class="full-width">
+            <mat-label>{{ field.name }}</mat-label>
+            <input matInput type="date" [formControlName]="field.name">
+          </mat-form-field>
+
+          <!-- Boolean -->
+          <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="field.name">
+            {{ field.name }}
+          </mat-checkbox>
+
+          <!-- Select -->
+          <mat-form-field *ngSwitchCase="'select'" appearance="outline" class="full-width">
+            <mat-label>{{ field.name }}</mat-label>
+            <mat-select [formControlName]="field.name">
+              <mat-option *ngFor="let opt of field.options" [value]="opt">{{ opt }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+        </ng-container>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="close()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="save()">Save</button>
+    </mat-dialog-actions>

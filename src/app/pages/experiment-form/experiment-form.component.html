@@ -1,99 +1,82 @@
-<div class="experiment-container">
-  <mat-card class="experiment-card">
-    <mat-card-header>
-      <mat-card-title>Create Experiment: {{ experimentType?.name }}</mat-card-title>
-    </mat-card-header>
+<mat-card>
+  <form [formGroup]="form" (ngSubmit)="submit()" class="experiment-form">
 
-    <mat-card-content>
-      <form [formGroup]="form" (ngSubmit)="submit()" class="experiment-form">
+    <!-- Notes Field -->
+    <mat-form-field appearance="fill" class="full-width">
+      <mat-label>Notes</mat-label>
+      <textarea matInput formControlName="notes" rows="3"></textarea>
+    </mat-form-field>
 
-        <!-- Title -->
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Title</mat-label>
-          <input matInput formControlName="title" placeholder="Experiment title">
-        </mat-form-field>
+    <!-- Dynamic Fields -->
+    <div formGroupName="data" class="dynamic-fields">
+      <ng-container *ngFor="let key of dataKeys">
 
-        <!-- Dynamic Fields -->
-        <div formGroupName="data" *ngIf="experimentType?.fields?.length" class="fields-section">
-          <h3 class="section-title">Experiment Data</h3>
+        <ng-container [ngSwitch]="getFieldType(key)">
 
-          <div *ngFor="let f of experimentType.fields" class="field-wrapper">
-            <ng-container [ngSwitch]="f.type">
+          <!-- Textarea -->
+          <mat-form-field *ngSwitchCase="'textarea'" appearance="fill" class="full-width">
+            <mat-label>{{ fieldKeyMap[key] }}</mat-label>
+            <textarea matInput [formControlName]="key" rows="3"></textarea>
+          </mat-form-field>
 
-              <!-- Text -->
-              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'text'">
-                <mat-label>{{ f.name }}</mat-label>
-                <input matInput [formControlName]="normalizeKey(f.name)">
-              </mat-form-field>
+          <!-- Text Input -->
+          <mat-form-field *ngSwitchCase="'text'" appearance="fill" class="full-width">
+            <mat-label>{{ fieldKeyMap[key] }}</mat-label>
+            <input matInput [formControlName]="key" />
+          </mat-form-field>
 
-              <!-- Textarea -->
-              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'textarea'">
-                <mat-label>{{ f.name }}</mat-label>
-                <textarea matInput [formControlName]="normalizeKey(f.name)" rows="3"></textarea>
-              </mat-form-field>
+          <!-- Number Input -->
+          <mat-form-field *ngSwitchCase="'number'" appearance="fill" class="full-width">
+            <mat-label>{{ fieldKeyMap[key] }}</mat-label>
+            <input matInput type="number" [formControlName]="key" />
+          </mat-form-field>
 
-              <!-- Number -->
-              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'number'">
-                <mat-label>{{ f.name }}</mat-label>
-                <input matInput type="number" [formControlName]="normalizeKey(f.name)">
-              </mat-form-field>
+          <!-- Date Picker -->
+          <mat-form-field *ngSwitchCase="'date'" appearance="fill" class="full-width">
+            <mat-label>{{ fieldKeyMap[key] }}</mat-label>
+            <input matInput [formControlName]="key" />
+            <mat-datepicker-toggle matSuffix ></mat-datepicker-toggle>
+            <mat-datepicker #picker_{{key}}></mat-datepicker>
+          </mat-form-field>
 
-              <!-- Date -->
-              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'date'">
-                <mat-label>{{ f.name }}</mat-label>
-                <input matInput type="date" [formControlName]="normalizeKey(f.name)">
-              </mat-form-field>
+          <!-- Boolean / Checkbox -->
+          <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="key" class="mb-2">
+            {{ fieldKeyMap[key] }}
+          </mat-checkbox>
 
-              <!-- Boolean -->
-              <mat-checkbox *ngSwitchCase="'boolean'" [formControlName]="normalizeKey(f.name)">
-                {{ f.name }}
-              </mat-checkbox>
+          <!-- Select -->
+          <mat-form-field *ngSwitchCase="'select'" appearance="fill" class="full-width">
+            <mat-label>{{ fieldKeyMap[key] }}</mat-label>
+            <mat-select [formControlName]="key">
+              <mat-option *ngFor="let option of getFieldOptions(key)" [value]="option">{{ option }}</mat-option>
+            </mat-select>
+          </mat-form-field>
 
-              <!-- Select -->
-              <mat-form-field appearance="outline" class="full-width" *ngSwitchCase="'select'">
-                <mat-label>{{ f.name }}</mat-label>
-                <mat-select [formControlName]="normalizeKey(f.name)">
-                  <mat-option *ngFor="let o of f.options" [value]="o">{{ o }}</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <!-- List -->
-              <div *ngSwitchCase="'list'" class="list-field">
-                <h4>{{ f.name }} (multiple)</h4>
-                <div formArrayName="{{ normalizeKey(f.name) }}">
-                  <div *ngFor="let c of getListControls(normalizeKey(f.name)).controls; let i=index" class="list-item">
-                    <mat-form-field appearance="outline" class="list-input">
-                      <input matInput [formControlName]="i" placeholder="Item {{i + 1}}">
-                    </mat-form-field>
-                    <button mat-icon-button color="warn" type="button"
-                      (click)="removeListItem(normalizeKey(f.name), i)">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                  <button mat-stroked-button type="button" (click)="addListItem(normalizeKey(f.name))">
-                    <mat-icon>add</mat-icon> Add Item
-                  </button>
-                </div>
+          <!-- List / Array -->
+          <div *ngSwitchCase="'list'" class="list-field">
+            <label>{{ fieldKeyMap[key] }}</label>
+            <div formArrayName="{{key}}">
+              <div *ngFor="let ctrl of getListControls(key).controls; let i = index" class="list-item"
+                [formGroupName]="i">
+                <mat-form-field appearance="fill" class="list-input">
+                  <input matInput [formControlName]="i" placeholder="Item {{ i + 1 }}" />
+                </mat-form-field>
+                <button mat-icon-button type="button" color="warn" (click)="removeListItem(key, i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
               </div>
-
-            </ng-container>
+            </div>
+            <button mat-stroked-button color="primary" type="button" (click)="addListItem(key)">Add Item</button>
           </div>
-        </div>
 
-        <!-- Notes -->
-        <mat-form-field appearance="outline" class="full-width notes-field">
-          <mat-label>Notes</mat-label>
-          <textarea matInput formControlName="notes" rows="4"></textarea>
-        </mat-form-field>
+        </ng-container>
+      </ng-container>
+    </div>
 
-        <!-- Save Button -->
-        <div class="actions">
-          <button mat-raised-button color="primary" type="submit">
-            <mat-icon>save</mat-icon> Save Experiment
-          </button>
-        </div>
+    <!-- Submit Button -->
+    <div class="form-actions mt-4">
+      <button mat-raised-button color="primary" type="submit">Save Experiment</button>
+    </div>
 
-      </form>
-    </mat-card-content>
-  </mat-card>
-</div>
+  </form>
+</mat-card>
