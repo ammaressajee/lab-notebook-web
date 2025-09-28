@@ -78,12 +78,38 @@
       </ng-container>
     </div>
 
+    <mat-card class="global-section">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="pickerStart" formControlName="start_date">
+        <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+        <mat-datepicker #pickerStart></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="pickerEnd" formControlName="end_date">
+        <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+        <mat-datepicker #pickerEnd></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Moving Forward</mat-label>
+        <textarea matInput formControlName="moving_forward"></textarea>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Conclusions</mat-label>
+        <textarea matInput formControlName="conclusions"></textarea>
+      </mat-form-field>
+    </mat-card>
+
     <!-- Notes -->
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Notes</mat-label>
       <textarea matInput formControlName="notes" rows="3"></textarea>
     </mat-form-field>
-    
+
     <!-- Submit Button -->
     <div class="form-actions">
       <button mat-raised-button color="primary" type="submit">Save Experiment</button>

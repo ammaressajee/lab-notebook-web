@@ -36,6 +36,10 @@ export class ApiService {
       `${this.baseUrl}/experiment_types/${experimentTypeId}/defaults`
     );
   }
+  
+  getExperimentsByProject(projectId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/projects/${projectId}/experiments`);
+  }
 
   setExperimentTypeDefaults(id: number, defaults: any) {
     return this.http.post(`${this.baseUrl}/experiment_types/${id}/defaults`

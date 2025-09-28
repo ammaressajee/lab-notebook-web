@@ -33,7 +33,24 @@
         </tr>
       </tbody>
     </table>
+
     <p><strong>Notes:</strong> {{ exp.notes || 'No notes' }}</p>
-    <p><strong>Date:</strong> {{ exp.date | date:'medium' }}</p>
+
+    <p><strong>Start Date:</strong>
+      {{ exp.start_date ? (exp.start_date | date:'mediumDate') : 'Not set' }}
+    </p>
+
+    <p><strong>End Date:</strong>
+      {{ exp.end_date ? (exp.end_date | date:'mediumDate') : 'Not set' }}
+    </p>
+
+    <p><strong>Moving Forward:</strong>
+      {{ exp.moving_forward || 'Not specified' }}
+    </p>
+
+    <p><strong>Conclusions:</strong>
+      {{ exp.conclusions || 'Not specified' }}
+    </p>
   </div>
+
 </div>

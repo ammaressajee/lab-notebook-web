@@ -40,10 +40,9 @@ export class ExperimentFormComponent implements OnInit {
   experimentType: any;
   fieldKeyMap: Record<string, string> = {};
   pickers: Record<string, any> = {};
+  public currentDate: Date = new Date();
 
   @ViewChildren('datepicker') pickerRefs!: QueryList<any>;
-
-  currentDate = new Date();
 
   constructor(
     private fb: FormBuilder,
@@ -54,6 +53,10 @@ export class ExperimentFormComponent implements OnInit {
   ) {
     this.form = this.fb.group({
       notes: [''],
+      start_date: [null],
+      end_date: [null],
+      moving_forward: [''],
+      conclusions: [''],
       data: this.fb.group({})
     });
   }
@@ -70,7 +73,7 @@ export class ExperimentFormComponent implements OnInit {
       const picker = this.pickerRefs.toArray()[idx];
       if (picker) this.pickers[key] = picker;
     });
-    this.cdr.detectChanges(); // fixes ExpressionChangedAfterItHasBeenCheckedError
+    this.cdr.detectChanges();
   }
 
   get dataKeys() {
@@ -105,6 +108,16 @@ export class ExperimentFormComponent implements OnInit {
     return name.replace(/\s+/g, '_').toLowerCase();
   }
 
+  formatDateFriendly(date: Date): string {
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
   loadProjectInfo() {
     this.api.getProjects().subscribe(projects => {
       const project = projects.find(p => p.id === this.projectId);
@@ -135,9 +148,18 @@ export class ExperimentFormComponent implements OnInit {
 
         setTimeout(() => {
           this.form.get('data')?.patchValue(patch);
-          this.form.get('notes')?.patchValue(experimentType.default_data?.notes || '');
+
+          this.form.patchValue({
+            notes: experimentType.default_data?.notes || '',
+            start_date: experimentType.default_data?.start_date ? new Date(experimentType.default_data.start_date) : null,
+            end_date: experimentType.default_data?.end_date ? new Date(experimentType.default_data.end_date) : null,
+            moving_forward: experimentType.default_data?.moving_forward || '',
+            conclusions: experimentType.default_data?.conclusions || ''
+          });
+
           this.cdr.detectChanges();
         });
+
       });
     });
   }
@@ -153,8 +175,6 @@ export class ExperimentFormComponent implements OnInit {
 
       switch (f.type) {
         case 'number':
-          dataGroup.addControl(key, this.fb.control(null, validators));
-          break;
         case 'date':
           dataGroup.addControl(key, this.fb.control(null, validators));
           break;
@@ -164,7 +184,6 @@ export class ExperimentFormComponent implements OnInit {
         case 'select':
           dataGroup.addControl(key, this.fb.control(f.options?.[0] || null, validators));
           break;
-        case 'textarea':
         default:
           dataGroup.addControl(key, this.fb.control('', validators));
       }
@@ -188,19 +207,32 @@ export class ExperimentFormComponent implements OnInit {
       data[this.fieldKeyMap[k]] = type === 'date' && value ? new Date(value).toISOString() : value;
     });
 
-    const payload = {
-      project_id: this.projectId,
-      experiment_type_id: this.experimentTypeId,
-      notes: raw.notes,
-      data
-    };
+    const friendlyDate = this.formatDateFriendly(new Date());
 
-    this.api.createExperiment(payload).subscribe({
-      next: () => {
-        alert('Experiment saved!');
-        this.router.navigate(['/projects', this.projectId]);
-      },
-      error: err => console.error(err)
+    // fetch existing experiments first to calculate increment #
+    this.api.getExperimentsByProject(this.projectId).subscribe(experiments => {
+      const experimentNumber = experiments.length + 1;
+
+      const payload = {
+        project_id: this.projectId,
+        experiment_type_id: this.experimentTypeId,
+        notes: raw.notes,
+        start_date: raw.start_date ? new Date(raw.start_date).toISOString() : null,
+        end_date: raw.end_date ? new Date(raw.end_date).toISOString() : null,
+        moving_forward: raw.moving_forward,
+        conclusions: raw.conclusions,
+        data,
+        title: `Experiment ${experimentNumber} - ${friendlyDate}`
+      };
+
+
+      this.api.createExperiment(payload).subscribe({
+        next: () => {
+          alert('Experiment saved!');
+          this.router.navigate(['/projects', this.projectId]);
+        },
+        error: err => console.error(err)
+      });
     });
   }
 }

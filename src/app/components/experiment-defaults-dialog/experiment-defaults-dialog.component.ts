@@ -23,10 +23,14 @@ export class ExperimentDefaultsDialogComponent {
     private dialogRef: MatDialogRef<ExperimentDefaultsDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    // Build form controls using existing defaults if available
     const controls: Record<string, any> = {};
+    const defaults = data.defaults || {};
+
     data.fields.forEach((field: any) => {
-      controls[field.name] = [''];
+      controls[field.name] = [defaults[field.name] ?? '']; // Use default value if exists
     });
+
     this.form = this.fb.group(controls);
   }
 
@@ -35,6 +39,6 @@ export class ExperimentDefaultsDialogComponent {
   }
 
   save() {
-    this.dialogRef.close(this.form.value);
+    this.dialogRef.close(this.form.value); // Return updated defaults
   }
 }

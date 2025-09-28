@@ -54,25 +54,28 @@ export class ExperimentTypeCreateComponent {
     this.fields.removeAt(index);
   }
 
-  openDefaultsDialog(exp_type: any) {
-    const dialogRef = this.dialog.open(ExperimentDefaultsDialogComponent, {
-      width: '500px',
-      data: exp_type
-    });
+openDefaultsDialog(exp_type: any) {
+  const dialogRef = this.dialog.open(ExperimentDefaultsDialogComponent, {
+    width: '500px',
+    data: {
+      fields: exp_type.fields || [], // <-- fallback to empty array
+      defaults: exp_type.defaults || {} // <-- fallback to empty object
+    }
+  });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Save defaults to backend
-        this.api.setExperimentTypeDefaults(exp_type.id, result).subscribe({
-          next: () => {
-            alert('Default values saved!');
-            this.loadExperimentTypes();
-          },
-          error: (err) => console.error('Failed to save defaults', err)
-        });
-      }
-    });
-  }
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      this.api.setExperimentTypeDefaults(exp_type.id, result).subscribe({
+        next: () => {
+          alert('Default values saved!');
+          this.loadExperimentTypes();
+        },
+        error: (err) => console.error('Failed to save defaults', err)
+      });
+    }
+  });
+}
+
 
 
   submit() {
