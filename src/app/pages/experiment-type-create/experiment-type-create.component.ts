@@ -31,10 +31,29 @@ export class ExperimentTypeCreateComponent {
       fields: this.fb.array([])
     });
   }
-
   ngOnInit() {
     this.loadExperimentTypes();
+    this.addDefaultFields();
   }
+
+  addDefaultFields() {
+    const defaultFields = [
+      { name: 'Purpose', type: 'text', required: false, options: '', default: '' },
+      { name: 'Process', type: 'textarea', required: false, options: '', default: '' },
+      { name: 'Result', type: 'textarea', required: false, options: '', default: '' },
+    ];
+
+    defaultFields.forEach(f => {
+      this.fields.push(this.fb.group({
+        name: [f.name, Validators.required],
+        type: [f.type, Validators.required],
+        required: [f.required],
+        options: [f.options],
+        default: [f.default]
+      }));
+    });
+  }
+
 
   get fields(): FormArray {
     return this.form.get('fields') as FormArray;
@@ -54,27 +73,27 @@ export class ExperimentTypeCreateComponent {
     this.fields.removeAt(index);
   }
 
-openDefaultsDialog(exp_type: any) {
-  const dialogRef = this.dialog.open(ExperimentDefaultsDialogComponent, {
-    width: '500px',
-    data: {
-      fields: exp_type.fields || [], // <-- fallback to empty array
-      defaults: exp_type.defaults || {} // <-- fallback to empty object
-    }
-  });
+  openDefaultsDialog(exp_type: any) {
+    const dialogRef = this.dialog.open(ExperimentDefaultsDialogComponent, {
+      width: '500px',
+      data: {
+        fields: exp_type.fields || [], // <-- fallback to empty array
+        defaults: exp_type.defaults || {} // <-- fallback to empty object
+      }
+    });
 
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      this.api.setExperimentTypeDefaults(exp_type.id, result).subscribe({
-        next: () => {
-          alert('Default values saved!');
-          this.loadExperimentTypes();
-        },
-        error: (err) => console.error('Failed to save defaults', err)
-      });
-    }
-  });
-}
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.api.setExperimentTypeDefaults(exp_type.id, result).subscribe({
+          next: () => {
+            alert('Default values saved!');
+            this.loadExperimentTypes();
+          },
+          error: (err) => console.error('Failed to save defaults', err)
+        });
+      }
+    });
+  }
 
 
 
@@ -109,28 +128,28 @@ openDefaultsDialog(exp_type: any) {
   }
 
   loadExperimentTypes() {
-  this.api.getExperimentTypes().subscribe({
-    next: (res) => {
-      this.experiment_types = res;
+    this.api.getExperimentTypes().subscribe({
+      next: (res) => {
+        this.experiment_types = res;
 
-      // Fetch defaults for each type
-      this.experiment_types.forEach((exp_type) => {
-        this.api.getExperimentTypeDefaults(exp_type.id).subscribe({
-          next: (res) => {
-            exp_type.defaults = res.defaults || {};
-          },
-          error: (err) => {
-            console.error(`Failed to fetch defaults for ${exp_type.name}`, err);
-            exp_type.defaults = {};
-          }
+        // Fetch defaults for each type
+        this.experiment_types.forEach((exp_type) => {
+          this.api.getExperimentTypeDefaults(exp_type.id).subscribe({
+            next: (res) => {
+              exp_type.defaults = res.defaults || {};
+            },
+            error: (err) => {
+              console.error(`Failed to fetch defaults for ${exp_type.name}`, err);
+              exp_type.defaults = {};
+            }
+          });
         });
-      });
-    },
-    error: (err) => {
-      console.error('Failed to load experiment types', err);
-    }
-  });
-}
+      },
+      error: (err) => {
+        console.error('Failed to load experiment types', err);
+      }
+    });
+  }
 
 }
 

@@ -82,3 +82,42 @@
     }
   }
 }
+/* global styling for the form section */
+.form-section {
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+
+  .date-fields {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+
+    .full-width {
+      flex: 1 1 200px;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  textarea {
+    resize: vertical;
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+}
+
+/* Notes field */
+.notes-field {
+  margin-top: 1.5rem;
+  textarea {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+}
+

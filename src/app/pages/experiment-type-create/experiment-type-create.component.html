@@ -97,16 +97,12 @@
             <thead>
               <tr>
                 <th>Field Name</th>
-                <th>Type</th>
-                <th>Required</th>
                 <th>Default Value</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let field of exp_type.fields">
                 <td>{{ field.name }}</td>
-                <td>{{ field.type }}</td>
-                <td>{{ field.required ? 'Yes' : 'No' }}</td>
                 <td>
                   <span *ngIf="exp_type.defaults && exp_type.defaults[field.name] !== undefined">
                     {{ exp_type.defaults[field.name] }}

@@ -23,34 +23,55 @@
     <span class="toggle-icon">{{ exp.expanded ? '▲' : '▼' }}</span>
   </div>
 
-  <!-- Expanded content -->
-  <div class="experiment-details" *ngIf="exp.expanded">
-    <table class="details-table">
-      <tbody>
-        <tr *ngFor="let key of getDataKeys(exp.data)">
-          <td class="field-name">{{ key }}</td>
-          <td class="field-value">{{ exp.data[key] }}</td>
-        </tr>
-      </tbody>
-    </table>
+ <!-- Expanded content -->
+<div class="experiment-details" *ngIf="exp.expanded">
+  <div class="details-card">
 
-    <p><strong>Notes:</strong> {{ exp.notes || 'No notes' }}</p>
+    <!-- Data Fields Section -->
+    <div class="data-fields">
+      <div class="data-item" *ngFor="let key of getDataKeys(exp.data)">
+        <span class="label">{{ key | titlecase }}</span>
+        <span class="value">{{ exp.data[key] }}</span>
+      </div>
+    </div>
 
-    <p><strong>Start Date:</strong>
-      {{ exp.start_date ? (exp.start_date | date:'mediumDate') : 'Not set' }}
-    </p>
+    <hr class="divider">
 
-    <p><strong>End Date:</strong>
-      {{ exp.end_date ? (exp.end_date | date:'mediumDate') : 'Not set' }}
-    </p>
+    <!-- Additional Info Section -->
+    <div class="info-section">
 
-    <p><strong>Moving Forward:</strong>
-      {{ exp.moving_forward || 'Not specified' }}
-    </p>
+      <div class="info-block">
+        <div class="info-label">Notes</div>
+        <div class="info-value">{{ exp.notes || 'No notes provided' }}</div>
+      </div>
 
-    <p><strong>Conclusions:</strong>
-      {{ exp.conclusions || 'Not specified' }}
-    </p>
+      <div class="info-block">
+        <div class="info-label">Start Date</div>
+        <div class="info-value">
+          {{ exp.start_date ? (exp.start_date | date:'mediumDate') : 'Not set' }}
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="info-label">End Date</div>
+        <div class="info-value">
+          {{ exp.end_date ? (exp.end_date | date:'mediumDate') : 'Not set' }}
+        </div>
+      </div>
+
+      <div class="info-block">
+        <div class="info-label">Moving Forward</div>
+        <div class="info-value">{{ exp.moving_forward || 'Not specified' }}</div>
+      </div>
+
+      <div class="info-block">
+        <div class="info-label">Conclusions</div>
+        <div class="info-value">{{ exp.conclusions || 'Not specified' }}</div>
+      </div>
+
+    </div>
   </div>
+</div>
+
 
 </div>

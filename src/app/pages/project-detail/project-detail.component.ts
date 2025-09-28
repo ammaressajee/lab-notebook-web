@@ -7,10 +7,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOption, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatOption, MatSelectModule, MatButtonModule, MatDividerModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatOption, MatSelectModule, MatButtonModule, MatDividerModule, MatIconModule],
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.scss'
 })
