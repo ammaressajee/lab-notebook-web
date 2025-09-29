@@ -87,24 +87,30 @@ export class ProjectDetailComponent {
   // Only send changed fields
   const payload: any = {};
 
-  Object.keys(formValue).forEach(key => {
+  // Standard fields
+  ['notes', 'start_date', 'end_date', 'moving_forward', 'conclusions'].forEach(key => {
     if (formValue[key] !== exp[key] && formValue[key] !== undefined) {
       payload[key] = formValue[key];
     }
   });
 
-  // Always handle dynamic 'data'
-  payload.data = {};
+  // Dynamic fields
+  const dataPayload: any = {};
   Object.keys(exp.data).forEach(key => {
     if (formValue[key] !== exp.data[key]) {
-      payload.data[key] = formValue[key];
+      dataPayload[key] = formValue[key];
     }
   });
+
+  // Only include `data` if something changed
+  if (Object.keys(dataPayload).length > 0) {
+    payload.data = { ...exp.data, ...dataPayload }; // merge unchanged fields
+  }
 
   this.api.partialUpdateExperiment(this.projectId, exp.id, payload).subscribe({
     next: () => {
       alert("Experiment updated successfully!");
-      Object.assign(exp, payload);  // merge changes into local experiment object
+      Object.assign(exp, payload); // merge changes into local experiment object
       exp.editing = false;
     },
     error: (err: any) => console.error(err)
