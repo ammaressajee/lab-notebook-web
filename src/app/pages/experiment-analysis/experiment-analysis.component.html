@@ -1,0 +1,75 @@
+<h2 class="dashboard-title">Experiment Analysis Dashboard</h2>
+
+
+<mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search experiments</mat-label>
+    <input matInput [(ngModel)]="searchTerm" placeholder="Type title or type..." />
+    
+</mat-form-field>
+<br>
+
+
+<mat-checkbox [(ngModel)]="selectAll" (change)="toggleSelectAll()" class="select-all">
+    Select All
+</mat-checkbox>
+
+<div class="experiment-list">
+    <div *ngFor="let exp of filteredExperiments()" class="experiment-row" [class.expanded]="exp.expanded">
+
+        <!-- Row Header: Checkbox + Title + Type + Toggle -->
+        <div class="experiment-header" (click)="exp.expanded = !exp.expanded">
+            <mat-checkbox [(ngModel)]="exp.selected" (click)="$event.stopPropagation()"></mat-checkbox>
+            <div class="header-info">
+                <strong>{{ exp.title }}</strong> ({{ exp.experiment_type_name }})
+                <span class="meta">Project: {{ exp.project_id }} | Date: {{ exp.date | date:'mediumDate' }}</span>
+            </div>
+            <span class="toggle-icon">{{ exp.expanded ? '▲' : '▼' }}</span>
+        </div>
+
+        <!-- Expanded Details -->
+        <div class="experiment-details" *ngIf="exp.expanded">
+
+            <!-- Dynamic Blueprint Data -->
+            <div *ngIf="exp.data && getDataKeys(exp.data).length > 0" class="dynamic-fields">
+                <h4>Blueprint Data</h4>
+                <div *ngFor="let key of getDataKeys(exp.data)" class="field-row">
+                    <strong>{{ key | titlecase }}:</strong> <span>{{ exp.data[key] }}</span>
+                </div>
+            </div>
+
+            <!-- Notes -->
+            <div *ngIf="exp.notes" class="notes-section">
+                <strong>Notes:</strong>
+                <p>{{ exp.notes }}</p>
+            </div>
+
+            <!-- Moving Forward -->
+            <div *ngIf="exp.moving_forward" class="moving-forward-section">
+                <strong>Moving Forward:</strong>
+                <p>{{ exp.moving_forward }}</p>
+            </div>
+
+            <!-- Conclusions -->
+            <div *ngIf="exp.conclusions" class="conclusions-section">
+                <strong>Conclusions:</strong>
+                <p>{{ exp.conclusions }}</p>
+            </div>
+
+        </div>
+    </div>
+</div>
+<br>
+<div class="action-row">
+    <button mat-raised-button color="primary" (click)="analyzeSelected()" [disabled]="!hasSelectedExperiments">
+        Analyze Selected Experiments
+    </button>
+</div>
+
+<mat-divider *ngIf="analysis"></mat-divider>
+
+<div *ngIf="analysis" class="analysis-panel mat-elevation-z3">
+  <h3 class="analysis-title">LLM Analysis</h3>
+  <div class="analysis-content">
+    <pre>{{ analysis }}</pre>
+  </div>
+</div>

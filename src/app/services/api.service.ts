@@ -56,17 +56,24 @@ export class ApiService {
     );
   }
 
- partialUpdateExperiment(projectId: number, experimentId: number, payload: any): Observable<any> {
-  return this.http.patch(
-    `${this.baseUrl}/projects/${projectId}/experiments/${experimentId}`,
-    payload
-  );
-}
+  partialUpdateExperiment(projectId: number, experimentId: number, payload: any): Observable<any> {
+    return this.http.patch(
+      `${this.baseUrl}/projects/${projectId}/experiments/${experimentId}`,
+      payload
+    );
+  }
 
-deleteExperiment(projectId: number, experimentId: number): Observable<any> {
-  return this.http.delete(`${this.baseUrl}/projects/${projectId}/experiments/${experimentId}`);
-}
+  deleteExperiment(projectId: number, experimentId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/projects/${projectId}/experiments/${experimentId}`);
+  }
 
+  getAllExperiments(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/experiments`);
+  }
+
+  analyzeMultipleExperiments(experimentIds: number[]): Observable<any> {
+    return this.http.post(`${this.baseUrl}/analyze/multi`, { experiment_ids: experimentIds });
+  }
 
 
 }

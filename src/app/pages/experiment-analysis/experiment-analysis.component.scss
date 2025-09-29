@@ -1,0 +1,200 @@
+.experiment-row {
+    border-bottom: 1px solid #ddd;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.experiment-row:hover {
+    background-color: #f5f5f5;
+}
+
+.experiment-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-info {
+    flex: 1;
+    margin-left: 8px;
+}
+
+.meta {
+    display: block;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+.experiment-details {
+    margin-top: 8px;
+    padding-left: 32px;
+    /* indent for details */
+}
+
+.field-row {
+    margin-bottom: 6px;
+}
+
+.notes-section,
+.moving-forward-section,
+.conclusions-section {
+    margin-top: 8px;
+}
+
+.toggle-icon {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.dashboard-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #222;
+}
+
+.filter-card {
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.search-field {
+    flex: 1;
+}
+
+.select-all {
+    font-weight: 500;
+    color: #555;
+}
+
+.dashboard-title {
+  font-size: 28px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.filter-card {
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+
+    .search-field {
+      flex: 1 1 300px;
+    }
+
+    .select-all {
+      margin-top: 8px;
+    }
+  }
+}
+
+.experiment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .experiment-row {
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+    padding: 12px;
+
+    &.expanded {
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background-color: #fafafa;
+    }
+
+    .experiment-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .header-info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .meta {
+          font-size: 12px;
+          color: #666;
+        }
+      }
+
+      .toggle-icon {
+        font-size: 14px;
+        color: #888;
+      }
+    }
+
+    .experiment-details {
+      margin-top: 12px;
+      padding-left: 32px;
+      border-left: 2px solid #e0e0e0;
+
+      h4 {
+        margin-bottom: 8px;
+        font-size: 16px;
+        color: #555;
+      }
+
+      .field-row,
+      .notes-section,
+      .moving-forward-section,
+      .conclusions-section {
+        margin-bottom: 8px;
+
+        strong {
+          color: #333;
+        }
+
+        p {
+          margin: 4px 0 0 0;
+          color: #444;
+        }
+      }
+    }
+  }
+}
+
+.action-row {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.analysis-panel {
+  margin-top: 24px;
+
+  h3 {
+    margin-bottom: 12px;
+    color: #333;
+  }
+
+  .analysis-card {
+    padding: 16px;
+    background-color: #f9f9f9;
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: #222;
+      font-size: 14px;
+    }
+  }
+
+}

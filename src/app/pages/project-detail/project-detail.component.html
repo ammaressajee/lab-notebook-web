@@ -22,15 +22,18 @@
     <span class="title">{{ exp.title }}</span>
     <span class="type">({{ exp.experiment_type_name }})</span>
 
-    <!-- Edit Button -->
-    <button mat-mini-button color="accent" class="edit-btn" (click)="toggleEdit(exp); $event.stopPropagation()">
-      {{ exp.editing ? 'Cancel' : 'Edit' }}
+    <!-- Edit Icon Button -->
+    <button mat-icon-button color="primary" (click)="toggleEdit(exp); $event.stopPropagation()"
+      matTooltip="{{ exp.editing ? 'Cancel Edit' : 'Edit Experiment' }}">
+      <mat-icon>{{ exp.editing ? 'cancel' : 'edit' }}</mat-icon>
     </button>
 
-    <!-- Delete Button -->
-    <button mat-mini-button color="warn" class="delete-btn" (click)="deleteExperiment(exp); $event.stopPropagation()">
-      Delete
+    <!-- Delete Icon Button -->
+    <button mat-icon-button color="warn" (click)="deleteExperiment(exp); $event.stopPropagation()"
+      matTooltip="Delete Experiment">
+      <mat-icon>delete</mat-icon>
     </button>
+
 
     <span class="toggle-icon">{{ exp.expanded ? '▲' : '▼' }}</span>
   </div>

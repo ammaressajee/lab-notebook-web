@@ -11,10 +11,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatOption, MatSelectModule, MatButtonModule, MatDividerModule, MatIconModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule, MatInputModule],
+  imports: [CommonModule, FormsModule, MatTooltipModule, MatFormFieldModule, MatOption, MatSelectModule, MatButtonModule, MatDividerModule, MatIconModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule, MatInputModule],
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.scss'
 })
@@ -79,57 +80,57 @@ export class ProjectDetailComponent {
     }
   }
 
- saveExperiment(exp: any) {
-  if (!exp.editForm.valid) return;
+  saveExperiment(exp: any) {
+    if (!exp.editForm.valid) return;
 
-  const formValue = exp.editForm.value;
+    const formValue = exp.editForm.value;
 
-  // Only send changed fields
-  const payload: any = {};
+    // Only send changed fields
+    const payload: any = {};
 
-  // Standard fields
-  ['notes', 'start_date', 'end_date', 'moving_forward', 'conclusions'].forEach(key => {
-    if (formValue[key] !== exp[key] && formValue[key] !== undefined) {
-      payload[key] = formValue[key];
+    // Standard fields
+    ['notes', 'start_date', 'end_date', 'moving_forward', 'conclusions'].forEach(key => {
+      if (formValue[key] !== exp[key] && formValue[key] !== undefined) {
+        payload[key] = formValue[key];
+      }
+    });
+
+    // Dynamic fields
+    const dataPayload: any = {};
+    Object.keys(exp.data).forEach(key => {
+      if (formValue[key] !== exp.data[key]) {
+        dataPayload[key] = formValue[key];
+      }
+    });
+
+    // Only include `data` if something changed
+    if (Object.keys(dataPayload).length > 0) {
+      payload.data = { ...exp.data, ...dataPayload }; // merge unchanged fields
     }
-  });
 
-  // Dynamic fields
-  const dataPayload: any = {};
-  Object.keys(exp.data).forEach(key => {
-    if (formValue[key] !== exp.data[key]) {
-      dataPayload[key] = formValue[key];
-    }
-  });
-
-  // Only include `data` if something changed
-  if (Object.keys(dataPayload).length > 0) {
-    payload.data = { ...exp.data, ...dataPayload }; // merge unchanged fields
+    this.api.partialUpdateExperiment(this.projectId, exp.id, payload).subscribe({
+      next: () => {
+        alert("Experiment updated successfully!");
+        Object.assign(exp, payload); // merge changes into local experiment object
+        exp.editing = false;
+      },
+      error: (err: any) => console.error(err)
+    });
   }
 
-  this.api.partialUpdateExperiment(this.projectId, exp.id, payload).subscribe({
-    next: () => {
-      alert("Experiment updated successfully!");
-      Object.assign(exp, payload); // merge changes into local experiment object
-      exp.editing = false;
-    },
-    error: (err: any) => console.error(err)
-  });
-}
+  deleteExperiment(exp: any) {
+    const confirmed = confirm(`Are you sure you want to delete experiment "${exp.title || 'Untitled'}"?`);
+    if (!confirmed) return;
 
-deleteExperiment(exp: any) {
-  const confirmed = confirm(`Are you sure you want to delete experiment "${exp.title || 'Untitled'}"?`);
-  if (!confirmed) return;
-
-  this.api.deleteExperiment(this.projectId, exp.id).subscribe({
-    next: () => {
-      alert('Experiment deleted successfully!');
-      // Remove from local list
-      this.experiments = this.experiments.filter(e => e.id !== exp.id);
-    },
-    error: (err) => console.error('Error deleting experiment:', err)
-  });
-}
+    this.api.deleteExperiment(this.projectId, exp.id).subscribe({
+      next: () => {
+        alert('Experiment deleted successfully!');
+        // Remove from local list
+        this.experiments = this.experiments.filter(e => e.id !== exp.id);
+      },
+      error: (err) => console.error('Error deleting experiment:', err)
+    });
+  }
 
   getDataKeys(data: any): string[] {
     return data ? Object.keys(data) : [];
