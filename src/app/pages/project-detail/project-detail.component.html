@@ -27,6 +27,11 @@
       {{ exp.editing ? 'Cancel' : 'Edit' }}
     </button>
 
+    <!-- Delete Button -->
+    <button mat-mini-button color="warn" class="delete-btn" (click)="deleteExperiment(exp); $event.stopPropagation()">
+      Delete
+    </button>
+
     <span class="toggle-icon">{{ exp.expanded ? '▲' : '▼' }}</span>
   </div>
 
@@ -34,7 +39,7 @@
   <div class="experiment-details" *ngIf="exp.expanded">
     <div class="details-card">
 
-      
+
 
       <!-- Edit Form -->
       <form *ngIf="exp.editing; else viewMode" [formGroup]="exp.editForm" (ngSubmit)="saveExperiment(exp)"
@@ -48,7 +53,7 @@
             <mat-form-field appearance="outline" class="field" class="full-width">
               <mat-label>{{ key | titlecase }}</mat-label>
 
-              
+
               <!-- If you want text input -->
               <textarea matInput [formControlName]="key" placeholder="Enter {{ key | titlecase }}" rows="4"></textarea>
 

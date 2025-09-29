@@ -63,6 +63,10 @@ export class ApiService {
   );
 }
 
+deleteExperiment(projectId: number, experimentId: number): Observable<any> {
+  return this.http.delete(`${this.baseUrl}/projects/${projectId}/experiments/${experimentId}`);
+}
+
 
 
 }

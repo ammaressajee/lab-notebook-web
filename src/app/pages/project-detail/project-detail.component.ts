@@ -117,8 +117,19 @@ export class ProjectDetailComponent {
   });
 }
 
+deleteExperiment(exp: any) {
+  const confirmed = confirm(`Are you sure you want to delete experiment "${exp.title || 'Untitled'}"?`);
+  if (!confirmed) return;
 
-
+  this.api.deleteExperiment(this.projectId, exp.id).subscribe({
+    next: () => {
+      alert('Experiment deleted successfully!');
+      // Remove from local list
+      this.experiments = this.experiments.filter(e => e.id !== exp.id);
+    },
+    error: (err) => console.error('Error deleting experiment:', err)
+  });
+}
 
   getDataKeys(data: any): string[] {
     return data ? Object.keys(data) : [];
