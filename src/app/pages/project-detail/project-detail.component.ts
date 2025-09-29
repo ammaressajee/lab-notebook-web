@@ -2,16 +2,19 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatOption, MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDatepicker, MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-project-detail',
-  imports: [CommonModule, FormsModule, MatFormFieldModule, MatOption, MatSelectModule, MatButtonModule, MatDividerModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatFormFieldModule, MatOption, MatSelectModule, MatButtonModule, MatDividerModule, MatIconModule, ReactiveFormsModule, MatDatepickerModule, MatNativeDateModule, MatInputModule],
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.scss'
 })
@@ -21,8 +24,11 @@ export class ProjectDetailComponent {
   experiments: any[] = [];
   experimentTypes: any[] = [];
   selectedBlueprintId!: number;
+  startPickers: { [key: number]: MatDatepicker<Date> } = {};
+  endPickers: { [key: number]: MatDatepicker<Date> } = {};
 
-  constructor(private route: ActivatedRoute, private api: ApiService, private router: Router) { }
+
+  constructor(private route: ActivatedRoute, private api: ApiService, private router: Router, private fb: FormBuilder) { }
 
   ngOnInit() {
     this.projectId = Number(this.route.snapshot.paramMap.get('id'));
@@ -35,6 +41,7 @@ export class ProjectDetailComponent {
       // Initialize expanded state for each experiment
       this.experiments = res.map(exp => ({ ...exp, expanded: false }));
     });
+
   }
 
   loadExperimentTypes() {
@@ -46,6 +53,66 @@ export class ProjectDetailComponent {
   toggleExperiment(exp: any) {
     exp.expanded = !exp.expanded;
   }
+
+  toggleEdit(exp: any) {
+    exp.editing = !exp.editing;
+
+    if (exp.editing) {
+      // Only create form if it doesn't exist yet
+      if (!exp.editForm) {
+        const group: any = {};
+
+        // 1. Add all dynamic blueprint fields
+        Object.keys(exp.data).forEach(key => {
+          group[key] = [exp.data[key]]; // prepopulate with current values
+        });
+
+        // 2. Add standard static fields
+        group.notes = [exp.notes || ''];
+        group.start_date = [exp.start_date || null];
+        group.end_date = [exp.end_date || null];
+        group.moving_forward = [exp.moving_forward || ''];
+        group.conclusions = [exp.conclusions || ''];
+
+        exp.editForm = this.fb.group(group);
+      }
+    }
+  }
+
+ saveExperiment(exp: any) {
+  if (!exp.editForm.valid) return;
+
+  const formValue = exp.editForm.value;
+
+  // Only send changed fields
+  const payload: any = {};
+
+  Object.keys(formValue).forEach(key => {
+    if (formValue[key] !== exp[key] && formValue[key] !== undefined) {
+      payload[key] = formValue[key];
+    }
+  });
+
+  // Always handle dynamic 'data'
+  payload.data = {};
+  Object.keys(exp.data).forEach(key => {
+    if (formValue[key] !== exp.data[key]) {
+      payload.data[key] = formValue[key];
+    }
+  });
+
+  this.api.partialUpdateExperiment(this.projectId, exp.id, payload).subscribe({
+    next: () => {
+      alert("Experiment updated successfully!");
+      Object.assign(exp, payload);  // merge changes into local experiment object
+      exp.editing = false;
+    },
+    error: (err: any) => console.error(err)
+  });
+}
+
+
+
 
   getDataKeys(data: any): string[] {
     return data ? Object.keys(data) : [];

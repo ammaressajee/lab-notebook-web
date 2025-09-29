@@ -36,7 +36,7 @@ export class ApiService {
       `${this.baseUrl}/experiment_types/${experimentTypeId}/defaults`
     );
   }
-  
+
   getExperimentsByProject(projectId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/projects/${projectId}/experiments`);
   }
@@ -55,5 +55,14 @@ export class ApiService {
       data
     );
   }
+
+ partialUpdateExperiment(projectId: number, experimentId: number, payload: any): Observable<any> {
+  return this.http.patch(
+    `${this.baseUrl}/projects/${projectId}/experiments/${experimentId}`,
+    payload
+  );
+}
+
+
 
 }

@@ -16,62 +16,137 @@
 <h2>Experiments</h2>
 
 <div *ngFor="let exp of experiments" class="experiment-card">
+
   <!-- Header: clickable to expand/collapse -->
   <div class="experiment-header" (click)="exp.expanded = !exp.expanded">
     <span class="title">{{ exp.title }}</span>
     <span class="type">({{ exp.experiment_type_name }})</span>
+
+    <!-- Edit Button -->
+    <button mat-mini-button color="accent" class="edit-btn" (click)="toggleEdit(exp); $event.stopPropagation()">
+      {{ exp.editing ? 'Cancel' : 'Edit' }}
+    </button>
+
     <span class="toggle-icon">{{ exp.expanded ? '▲' : '▼' }}</span>
   </div>
 
- <!-- Expanded content -->
-<div class="experiment-details" *ngIf="exp.expanded">
-  <div class="details-card">
+  <!-- Expanded content -->
+  <div class="experiment-details" *ngIf="exp.expanded">
+    <div class="details-card">
 
-    <!-- Data Fields Section -->
-    <div class="data-fields">
-      <div class="data-item" *ngFor="let key of getDataKeys(exp.data)">
-        <span class="label">{{ key | titlecase }}</span>
-        <span class="value">{{ exp.data[key] }}</span>
-      </div>
-    </div>
+      
 
-    <hr class="divider">
+      <!-- Edit Form -->
+      <form *ngIf="exp.editing; else viewMode" [formGroup]="exp.editForm" (ngSubmit)="saveExperiment(exp)"
+        class="edit-form">
 
-    <!-- Additional Info Section -->
-    <div class="info-section">
+        <br>
+        <!-- Dynamic Blueprint Fields -->
+        <div class="dynamic-fields">
+          <ng-container *ngFor="let key of getDataKeys(exp.data)">
 
-      <div class="info-block">
-        <div class="info-label">Notes</div>
-        <div class="info-value">{{ exp.notes || 'No notes provided' }}</div>
-      </div>
+            <mat-form-field appearance="outline" class="field" class="full-width">
+              <mat-label>{{ key | titlecase }}</mat-label>
 
-      <div class="info-block">
-        <div class="info-label">Start Date</div>
-        <div class="info-value">
-          {{ exp.start_date ? (exp.start_date | date:'mediumDate') : 'Not set' }}
+              
+              <!-- If you want text input -->
+              <textarea matInput [formControlName]="key" placeholder="Enter {{ key | titlecase }}" rows="4"></textarea>
+
+              <!-- Optional hint -->
+              <mat-hint>Required</mat-hint>
+
+              <!-- Optional error message -->
+              <mat-error *ngIf="exp.editForm.get(key)?.invalid">
+                Please enter a valid {{ key | titlecase }}
+              </mat-error>
+            </mat-form-field><br><br><br>
+          </ng-container>
         </div>
-      </div>
 
-      <div class="info-block">
-        <div class="info-label">End Date</div>
-        <div class="info-value">
-          {{ exp.end_date ? (exp.end_date | date:'mediumDate') : 'Not set' }}
+
+        <!-- Static Fields: Dates and Notes -->
+        <div class="static-fields grid">
+
+          <mat-form-field appearance="outline">
+            <mat-label>Start Date</mat-label>
+            <input matInput [matDatepicker]="pickerStart" formControlName="start_date">
+            <mat-datepicker-toggle matSuffix [for]="pickerStart"></mat-datepicker-toggle>
+            <mat-datepicker #pickerStart></mat-datepicker>
+          </mat-form-field><br><br>
+
+          <mat-form-field appearance="outline">
+            <mat-label>End Date</mat-label>
+            <input matInput [matDatepicker]="pickerEnd" formControlName="end_date">
+            <mat-datepicker-toggle matSuffix [for]="pickerEnd"></mat-datepicker-toggle>
+            <mat-datepicker #pickerEnd></mat-datepicker>
+          </mat-form-field><br><br>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="3"></textarea>
+          </mat-form-field><br><br>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Moving Forward</mat-label>
+            <textarea matInput formControlName="moving_forward" rows="3"></textarea>
+          </mat-form-field><br><br>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Conclusions</mat-label>
+            <textarea matInput formControlName="conclusions" rows="3"></textarea>
+          </mat-form-field>
+
         </div>
-      </div>
 
-      <div class="info-block">
-        <div class="info-label">Moving Forward</div>
-        <div class="info-value">{{ exp.moving_forward || 'Not specified' }}</div>
-      </div>
+        <button mat-raised-button color="primary" type="submit" class="save-btn">
+          Save Changes
+        </button>
+      </form>
 
-      <div class="info-block">
-        <div class="info-label">Conclusions</div>
-        <div class="info-value">{{ exp.conclusions || 'Not specified' }}</div>
-      </div>
+      <!-- View Mode -->
+      <ng-template #viewMode>
+        <div class="data-fields">
+          <div class="data-item" *ngFor="let key of getDataKeys(exp.data)">
+            <span class="label">{{ key | titlecase }}</span>
+            <span class="value">{{ exp.data[key] }}</span>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="info-section">
+          <div class="info-block">
+            <div class="info-label">Notes</div>
+            <div class="info-value">{{ exp.notes || 'No notes provided' }}</div>
+          </div>
+
+          <div class="info-block">
+            <div class="info-label">Start Date</div>
+            <div class="info-value">
+              {{ exp.start_date ? (exp.start_date | date:'mediumDate') : 'Not set' }}
+            </div>
+          </div>
+
+          <div class="info-block">
+            <div class="info-label">End Date</div>
+            <div class="info-value">
+              {{ exp.end_date ? (exp.end_date | date:'mediumDate') : 'Not set' }}
+            </div>
+          </div>
+
+          <div class="info-block">
+            <div class="info-label">Moving Forward</div>
+            <div class="info-value">{{ exp.moving_forward || 'Not specified' }}</div>
+          </div>
+
+          <div class="info-block">
+            <div class="info-label">Conclusions</div>
+            <div class="info-value">{{ exp.conclusions || 'Not specified' }}</div>
+          </div>
+        </div>
+      </ng-template>
 
     </div>
   </div>
-</div>
-
 
 </div>

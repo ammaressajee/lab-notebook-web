@@ -39,8 +39,8 @@ export class ExperimentTypeCreateComponent {
   addDefaultFields() {
     const defaultFields = [
       { name: 'Purpose', type: 'text', required: false, options: '', default: '' },
-      { name: 'Process', type: 'textarea', required: false, options: '', default: '' },
-      { name: 'Result', type: 'textarea', required: false, options: '', default: '' },
+      { name: 'Procedure', type: 'textarea', required: false, options: '', default: '' },
+      { name: 'Calculations', type: 'textarea', required: false, options: '', default: '' },
     ];
 
     defaultFields.forEach(f => {
